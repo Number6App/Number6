@@ -1,0 +1,175 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Comprehending Slack messages
+
+Parameters:
+  SlackChannel:
+    Description: Id of the Slack channel to post results to (the id in the Slack API, not the name)
+    Type: String
+  SlackTokenSecretName:
+    Description: Name of the secret in AWS Secrets Manager that looks up the Slack token
+    Type: String
+  BlacklistedChannels:
+    Description: CSV string list of channel names that shouldn't be analysed
+    Type: String
+  EnvType:
+    Description: Environment type.
+    Type: String
+    AllowedValues:
+      - prod
+      - test
+    ConstraintDescription: must specify prod or test.
+Conditions:
+  CreateProdResources: !Equals [ !Ref EnvType, prod ]
+
+Resources:
+  MessageSentimentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dev.number6.sentiment.ChannelMessagesSentimentRequestHandler::handleRequest
+      Runtime: java11
+      CodeUri: ./sentiment
+      Timeout: 180
+      MemorySize: 512
+      Role: !GetAtt Number6MasterFunctionRole.Arn
+      Environment:
+        Variables:
+          DB_TABLE: !Select [1, !Split ["/", !GetAtt SlackComprehensions.Arn]]
+      Events:
+        Msg:
+          Type: SNS
+          Properties:
+            Topic: !Ref SlackChannelMessagesTopic
+      AutoPublishAlias: MsgSentiment
+      DeploymentPreference:
+        Type: AllAtOnce
+
+  MessageEntityFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dev.number6.entity.ChannelMessagesEntityRequestHandler::handleRequest
+      Runtime: java11
+      CodeUri: ./entity
+      Timeout: 180
+      MemorySize: 512
+      Role: !GetAtt Number6MasterFunctionRole.Arn
+      Environment:
+        Variables:
+          DB_TABLE: !Select [1, !Split ["/", !GetAtt SlackComprehensions.Arn]]
+      Events:
+        Msg:
+          Type: SNS
+          Properties:
+            Topic: !Ref SlackChannelMessagesTopic
+      AutoPublishAlias: MsgEntity
+      DeploymentPreference:
+        Type: AllAtOnce
+
+  MessageKeyPhrasesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dev.number6.keyphrases.ChannelMessagesKeyPhrasesRequestHandler::handleRequest
+      Runtime: java11
+      CodeUri: ./phrases
+      Timeout: 180
+      MemorySize: 512
+      Role: !GetAtt Number6MasterFunctionRole.Arn
+      Environment:
+        Variables:
+          DB_TABLE: !Select [1, !Split ["/", !GetAtt SlackComprehensions.Arn]]
+      Events:
+        Msg:
+          Type: SNS
+          Properties:
+            Topic: !Ref SlackChannelMessagesTopic
+      AutoPublishAlias: MsgKeyPhrases
+      DeploymentPreference:
+        Type: AllAtOnce
+
+  SlackReaderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dev.number6.slackreader.SlackReaderRequestHandler::handleRequest
+      Runtime: java11
+      CodeUri: ./reader
+      Timeout: 180
+      MemorySize: 512
+      Role: !GetAtt Number6MasterFunctionRole.Arn
+      Environment:
+        Variables:
+          SLACK_TOKEN_SECRET_NAME: !Ref SlackTokenSecretName
+          SLACK_MSG_TOPIC_ARN: !Ref SlackChannelMessagesTopic
+          DB_TABLE: !Select [1, !Split ["/", !GetAtt SlackComprehensions.Arn]]
+          BLACKLISTED_CHANNELS: !Ref BlacklistedChannels
+      Events:
+        Timer:
+          Type: Schedule
+          Properties:
+            Schedule: !If [CreateProdResources, "cron(0 1 * * ? *)", "cron(0 0 * * ? 2200)"]
+      AutoPublishAlias: SlackReader
+      DeploymentPreference:
+        Type: AllAtOnce
+
+  ProcessComprehensionsStream:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dev.number6.slackposter.SlackPosterRequestHandler::handleRequest
+      Runtime: java11
+      CodeUri: ./poster
+      Timeout: 180
+      MemorySize: 512
+      Role: !GetAtt Number6MasterFunctionRole.Arn
+      Environment:
+        Variables:
+          META_CHANNEL_ID: !Ref SlackChannel
+          SLACK_TOKEN_SECRET_NAME: !Ref SlackTokenSecretName
+          SLACK_POST_MESSAGE_URL: https://slack.com/api/chat.postMessage
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt SlackComprehensions.StreamArn
+            BatchSize: 100
+            StartingPosition: TRIM_HORIZON
+
+  SlackComprehensions:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: channelName
+          AttributeType: S
+        - AttributeName: comprehensionDate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: channelName
+          KeyType: HASH
+        - AttributeName: comprehensionDate
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 3
+        WriteCapacityUnits: 3
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  Number6MasterFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/ComprehendFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+  SlackChannelMessagesTopic:
+    Type: "AWS::SNS::Topic"

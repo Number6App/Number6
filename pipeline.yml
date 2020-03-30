@@ -1,0 +1,291 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CodePipeline for Number6
+
+Parameters:
+  ProjectName:
+    Description: Name of the project
+    Type: String
+    Default: Number6
+  GitHubOwner:
+    Description: The GitHub username where the repository resides
+    Type: String
+  GitHubRepoName:
+    Description: The name of the repository in GitHub
+    Type: String
+  GitHubBranch:
+    Description: The name of the branch in the repository to build from when it changes
+    Type: String
+  ProductionAccount:
+    Description: AWS AccountNumber for production
+    Type: Number
+
+Resources:
+  BuildProject:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: !Ref ProjectName
+      Description: !Ref ProjectName
+      ServiceRole: !ImportValue BuildProjectRoleArn
+      EncryptionKey: !ImportValue CMKARN
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: linuxContainer
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/java:openjdk-11
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !ImportValue ArtifactBucket
+      Source:
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: Name
+          Value: !Ref ProjectName
+
+  AppPipelineWebhook:
+    Type: AWS::CodePipeline::Webhook
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: '{{resolve:secretsmanager:no6/test/github/1}}'
+      Filters:
+        - JsonPath: "$.ref"
+          MatchEquals: refs/heads/{Branch}
+      TargetPipeline: !Ref Pipeline
+      TargetAction: CheckoutSource
+      Name: Number6PipelineWebhook
+      TargetPipelineVersion: !GetAtt Pipeline.Version
+      RegisterWithThirdParty: true
+
+  Pipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    DependsOn: PipelinePolicy
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: !ImportValue ArtifactBucket
+        EncryptionKey:
+          Id: !ImportValue CMKARN
+          Type: KMS
+      RoleArn: !ImportValue PipeLineRoleArn
+      Name: !Ref AWS::StackName
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: CheckoutSource
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                Owner: !Ref GitHubOwner
+                Repo: !Ref GitHubRepoName
+                Branch: !Ref GitHubBranch
+                PollForSourceChanges: false
+                OAuthToken: '{{resolve:secretsmanager:no6/github:SecretString:no6/github}}'
+              OutputArtifacts:
+                - Name: SourceCheckoutArtifact
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref BuildProject
+              RunOrder: 1
+              InputArtifacts:
+                - Name: SourceCheckoutArtifact
+              OutputArtifacts:
+                - Name: BuildOutput
+        - Name: DeployToTest
+          Actions:
+            - Name: CreateChangeSetTest
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ChangeSetName: Number6ChangeSet
+                ActionMode: CHANGE_SET_REPLACE
+                StackName: Number6
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !ImportValue CFDeployerRoleArn
+                TemplatePath: BuildOutput::deploy/template-export.yml
+                TemplateConfiguration: BuildOutput::deploy/No6AppTemplateConfig-test.json
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+            - Name: DeployChangeSetTest
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ChangeSetName: Number6ChangeSet
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: Number6
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 2
+            - Name: UATApproval
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: 1
+                Provider: Manual
+              Configuration:
+                CustomData: Approve once UAT has been completed.
+              RunOrder: 3
+        - Name: DeployToProd
+          Actions:
+            - Name: CreateChangeSetProd
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ChangeSetName: Number6Prod
+                ActionMode: CHANGE_SET_REPLACE
+                StackName: Number6Prod
+                Capabilities: CAPABILITY_NAMED_IAM
+                TemplatePath:  BuildOutput::deploy/template-export.yml
+                TemplateConfiguration: BuildOutput::deploy/No6AppTemplateConfig-prod.json
+# uncomment out this RoleArn once prod roles stack is created
+                RoleArn: !Sub arn:aws:iam::${ProductionAccount}:role/${ProjectName}-cloudformationdeployer-role
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+# uncomment out this RoleArn once prod roles stack is created
+              RoleArn: !Sub arn:aws:iam::${ProductionAccount}:role/DevCodePipelineCloudFormationRole
+            - Name: DeployChangeSetProd
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ChangeSetName: Number6Prod
+                ActionMode: CHANGE_SET_EXECUTE
+                StackName: Number6Prod
+                RoleArn: !Sub arn:aws:iam::${ProductionAccount}:role/${ProjectName}-cloudformationdeployer-role
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 2
+# uncomment out this RoleArn once prod roles stack is created
+              RoleArn: !Sub arn:aws:iam::${ProductionAccount}:role/DevCodePipelineCloudFormationRole
+
+  PipelinePolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: S3BucketPolicy
+    Properties:
+      PolicyName: !Sub ${ProjectName}-codepipeline-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - codepipeline:*
+              - iam:ListRoles
+              - cloudformation:Describe*
+              - cloudFormation:List*
+              - codecommit:List*
+              - codecommit:Get*
+              - codecommit:GitPull
+              - codecommit:UploadArchive
+              - codecommit:CancelUploadArchive
+              - codebuild:BatchGetBuilds
+              - codebuild:StartBuild
+              - cloudformation:CreateStack
+              - cloudformation:DeleteStack
+              - cloudformation:DescribeStacks
+              - cloudformation:UpdateStack
+              - cloudformation:CreateChangeSet
+              - cloudformation:DeleteChangeSet
+              - cloudformation:DescribeChangeSet
+              - cloudformation:ExecuteChangeSet
+              - cloudformation:SetStackPolicy
+              - cloudformation:ValidateTemplate
+              - iam:PassRole
+              - s3:ListAllMyBuckets
+              - s3:GetBucketLocation
+            Resource:
+              - "*"
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: !ImportValue CMKARN
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketPolicy
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+              - !Join ['',['arn:aws:s3:::',!ImportValue ArtifactBucket, '/*']]
+              - !Join ['',['arn:aws:s3:::',!ImportValue ArtifactBucket]]
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Resource:
+              - !Sub arn:aws:iam::${ProductionAccount}:role/DevCodePipelineCloudFormationRole
+      Roles:
+        - !ImportValue PipeLineRoleName
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !ImportValue ArtifactBucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:*
+            Effect: Allow
+            Resource:
+              - !Join ['',['arn:aws:s3:::',!ImportValue ArtifactBucket, '/*']]
+              - !Join ['',['arn:aws:s3:::',!ImportValue ArtifactBucket]]
+            Principal:
+              # Comment out the 2 ProductionAccount Role Arn references when creating this stack for the first time
+              # uncomment them out and update the stack once the roles have been created in the other account
+              AWS:
+                - !Sub arn:aws:iam::${ProductionAccount}:role/DevCodePipelineCloudFormationRole
+                - !Sub arn:aws:iam::${ProductionAccount}:role/${ProjectName}-cloudformationdeployer-role
+                - !ImportValue BuildProjectRoleArn
+
+  BuildProjectPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: S3BucketPolicy
+    Properties:
+      PolicyName: !Sub ${ProjectName}-CodeBuildPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketPolicy
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+              - !Join ['',['arn:aws:s3:::',!ImportValue ArtifactBucket, '/*']]
+              - !Join ['',['arn:aws:s3:::',!ImportValue ArtifactBucket]]
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+          - Effect: Allow
+            Action:
+              - kms:*
+            Resource: !ImportValue CMKARN
+      Roles:
+        - !ImportValue BuildProjectRoleName

@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Role to be assumed by CodePipeline in production
+Parameters:
+  ProjectName:
+    Description: Project Name
+    Type: String
+    Default: Number6
+  SlackTokenSecretName:
+    Description: Name of the Slack token in Secrets Manager
+    Type: String
+    Default: no6/prod/slack/1
+  TestAccount:
+    Description: AWS AccountNumber for Test account
+    Type: Number
+  S3Bucket:
+    Description: Name of the S3 Bucket in the Test account that holds the deployment artifacts
+    Type: String
+  CMKARN:
+    Description: ARN of the CMK created in the Test account
+    Type: String
+  SlackOAuthToken:
+    Description: Slack OAuth token
+    Type: String
+
+Resources:
+  CFRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: DevCodePipelineCloudFormationRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub ${TestAccount}
+#                - !Sub arn:aws:iam::${DevAccount}:role/${ProjectName}-codepipeline-role
+            Action:
+              - sts:AssumeRole
+      Path: /
+  CFPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: DevCodePipelineCloudFormationPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:*
+              - s3:*
+              - iam:PassRole
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - kms:*
+            Resource: !Ref CMKARN
+      Roles:
+        - !Ref CFRole
+
+  CFDeployerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-cloudformationdeployer-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        - "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+        - "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+        - "arn:aws:iam::aws:policy/IAMFullAccess"
+        - "arn:aws:iam::aws:policy/AWSCodeDeployFullAccess"
+
+  CFDeployerPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: cloudformationdeployer-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:*
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketPolicy
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+              - !Sub arn:aws:s3:::${S3Bucket}/*
+              - !Sub arn:aws:s3:::${S3Bucket}
+      Roles:
+        - !Ref CFDeployerRole
+
+  SlackOauthSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Slack OAuth Token
+      Name: !Ref SlackTokenSecretName
+      SecretString:
+        !Ref SlackOAuthToken
+
+Outputs:
+  SlackTokenSecretName:
+    Value: !Ref SlackTokenSecretName
+    Export:
+      Name: SlackTokenSecretName

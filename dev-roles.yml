@@ -1,0 +1,158 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Roles to be assumed by CodePipeline in dev account
+Parameters:
+  ProjectName:
+    Description: Project Name
+    Type: String
+    Default: Number6
+  SlackTokenSecretName:
+    Description: Name used to store the Slack token in Secrets Manager
+    Type: String
+    Default: no6/test/slack/1
+  SlackOAuthToken:
+    Description: Slack OAuth token
+    Type: String
+  GitHubTokenSecretName:
+    Description: Name used to store the GitHub token in Secrets Manager
+    Type: String
+    Default: no6/test/github/1
+  GitHubToken:
+    Description: GitHub access token
+    Type: String
+
+Resources:
+  BuildProjectRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-CodeBuildRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+
+  PipeLineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-codepipeline-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+
+  CodeCommitPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: PipelineCodeCommitPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - codecommit:BatchGetRepositories
+              - codecommit:Get*
+              - codecommit:GitPull
+              - codecommit:List*
+              - codecommit:CancelUploadArchive
+              - codecommit:UploadArchive
+              - s3:*
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - kms:*
+            Resource: !ImportValue CMKARN
+      Roles:
+        - !Ref PipeLineRole
+
+  CFDeployerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${ProjectName}-cloudformationdeployer-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+        - "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+        - "arn:aws:iam::aws:policy/IAMFullAccess"
+        - "arn:aws:iam::aws:policy/AWSCodeDeployFullAccess"
+
+  CFDeployerPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${ProjectName}-cloudformationdeployer-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:*
+            Resource: "*"
+      Roles:
+        - !Ref CFDeployerRole
+
+  SlackSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Slack OAuth Token
+      Name: !Ref SlackTokenSecretName
+      SecretString:
+        !Ref SlackOAuthToken
+
+  GithubSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: GitHub access token
+      Name: !Ref GitHubTokenSecretName
+      SecretString:
+        !Ref GitHubToken
+
+Outputs:
+  GitHubTokenSecretName:
+    Value: !Ref GitHubTokenSecretName
+    Export:
+      Name: GitHubTokenSecretName
+  SlackTokenSecretName:
+    Value: !Ref SlackTokenSecretName
+    Export:
+      Name: SlackTokenSecretName
+  BuildProjectRoleArn:
+    Value: !GetAtt BuildProjectRole.Arn
+    Export:
+      Name: BuildProjectRoleArn
+  PipeLineRoleArn:
+    Value: !GetAtt PipeLineRole.Arn
+    Export:
+      Name: PipeLineRoleArn
+  CFDeployerArn:
+    Value: !GetAtt CFDeployerRole.Arn
+    Export:
+      Name: CFDeployerRoleArn
+  PipeLineRoleName:
+    Value: !Ref PipeLineRole
+    Export:
+      Name: PipeLineRoleName
+  BuildProjectRoleName:
+    Value: !Ref BuildProjectRole
+    Export:
+      Name: BuildProjectRoleName
