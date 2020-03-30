@@ -48,7 +48,7 @@ Resources:
     Properties:
       Authentication: GITHUB_HMAC
       AuthenticationConfiguration:
-        SecretToken: '{{resolve:secretsmanager:no6/test/github/1}}'
+        SecretToken: '{{resolve:secretsmanager:no6/test/github/2}}'
       Filters:
         - JsonPath: "$.ref"
           MatchEquals: refs/heads/{Branch}
@@ -84,7 +84,7 @@ Resources:
                 Repo: !Ref GitHubRepoName
                 Branch: !Ref GitHubBranch
                 PollForSourceChanges: false
-                OAuthToken: '{{resolve:secretsmanager:no6/github:SecretString:no6/github}}'
+                OAuthToken: '{{resolve:secretsmanager:no6/test/github/2}}'
               OutputArtifacts:
                 - Name: SourceCheckoutArtifact
               RunOrder: 1

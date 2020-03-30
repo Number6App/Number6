@@ -12,6 +12,7 @@ Parameters:
   SlackOAuthToken:
     Description: Slack OAuth token
     Type: String
+    NoEcho: true
   GitHubTokenSecretName:
     Description: Name used to store the GitHub token in Secrets Manager
     Type: String
@@ -19,6 +20,7 @@ Parameters:
   GitHubToken:
     Description: GitHub access token
     Type: String
+    NoEcho: true
 
 Resources:
   BuildProjectRole:
