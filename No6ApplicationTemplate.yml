@@ -134,7 +134,9 @@ Resources:
 
   SlackComprehensions:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
     Properties:
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: channelName
           AttributeType: S
@@ -145,9 +147,6 @@ Resources:
           KeyType: HASH
         - AttributeName: comprehensionDate
           KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: 3
-        WriteCapacityUnits: 3
       StreamSpecification:
         StreamViewType: NEW_IMAGE
 
