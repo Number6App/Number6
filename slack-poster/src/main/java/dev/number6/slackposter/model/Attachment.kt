@@ -1,39 +1,28 @@
 package dev.number6.slackposter.model
 
-open class Attachment {
-    var fallback = "Required plain-text summary of the attachment."
-    var color // = "#2eb886";
-            : String? = null
-    @JvmField
-    var pretext // = "Optional text that appears above the attachment block";
-            : String? = null
-    var authorName // = "Not Bobby Tables";
-            : String? = null
-    var authorLink // = "http://flickr.com/bobby/";
-            : String? = null
-    var authorIcon // = "http://flickr.com/icons/bobby.jpg";
-            : String? = null
-    var title // = "Slack API Documentation";
-            : String? = null
-    var titleLink // = "https://api.slack.com/";
-            : String? = null
-    var text // = "Optional text that appears within the attachment";
-            : String? = null
-//    @JvmField
-    lateinit var fields // = new Field[]{new Field(), new Field(), new Field()};
-            : Array<Field>
-    var imageUrl // = "http://my-website.com/path/to/image.jpg";
-            : String? = null
-    var thumbUrl // = "http://example.com/path/to/thumb.png";
-            : String? = null
-    var footer // = "Slack API";
-            : String? = null
-    var footerIcon // = "https://platform.slack-edge.com/img/default_application_icon.png";
-            : String? = null
-    var ts // = 123456789L;
-            : Long? = null
+fun String.asTitleCase(): String {
+    return Character.toTitleCase(this[0]).toString() + this.toLowerCase().substring(1)
+}
+
+open class Attachment(var fallback: String,// = "#2eb886";
+                      var color: String? = null,// = "Optional text that appears above the attachment block";
+                      var pretext: String? = null,// = "Not Bobby Tables";
+                      var authorName: String? = null,// = "http://flickr.com/bobby/";
+                      var authorLink: String? = null,// = "http://flickr.com/icons/bobby.jpg";
+                      var authorIcon: String? = null,// = "Slack API Documentation";
+                      var title: String? = null,// = "https://api.slack.com/";
+                      var titleLink: String? = null,// = "Optional text that appears within the attachment";
+                      var text: String? = null,//
+                      var fields // = new Field[]{new Field(), new Field(), new Field()};
+                      : Array<Field>,// = "http://my-website.com/path/to/image.jpg";
+                      var imageUrl: String? = null,// = "http://example.com/path/to/thumb.png";
+                      var thumbUrl: String? = null,// = "Slack API";
+                      var footer: String? = null,// = "https://platform.slack-edge.com/img/default_application_icon.png";
+                      var footerIcon: String? = null,// = 123456789L;
+                      var ts: Long? = null) {
 
     protected fun asTitleCase(input: String): String {
         return Character.toTitleCase(input[0]).toString() + input.toLowerCase().substring(1)
+
     }
 }

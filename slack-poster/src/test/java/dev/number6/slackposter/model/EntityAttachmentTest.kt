@@ -30,7 +30,7 @@ internal class EntityAttachmentTest {
         val image: ChannelSummaryImage = ChannelSummaryImageBuilder.Companion.builder()
                 .entityTotals(entityTotals)
                 .build()
-        val testee = EntityAttachment(image)
+        val testee = EntityAttachment.fromImage(image)
         println(Arrays.toString(testee.fields))
         Stream.of(*testee.fields).forEach { f: Field -> Assertions.assertThat(f.value).isEqualTo(expectedFieldValues[f.title]) }
     }

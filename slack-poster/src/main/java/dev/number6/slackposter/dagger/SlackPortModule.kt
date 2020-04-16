@@ -10,7 +10,7 @@ import dev.number6.slackposter.port.SlackPosterConfigurationPort
 @Module
 class SlackPortModule {
     @Provides
-    fun providesSlackPort(httpPort: HttpPort?,
+    fun providesSlackPort(httpPort: HttpPort,
                           config: SlackPosterConfigurationPort): SlackPort {
         return SlackPosterAdaptor(httpPort, config)
     }

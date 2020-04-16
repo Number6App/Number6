@@ -14,13 +14,13 @@ class PresentableChannelSummary(private val image: ChannelSummaryImage) {
         get() = arrayOf(overallSentimentAttachment, entityAttachment, keyPhrasesAttachment)
 
     private val overallSentimentAttachment: Attachment
-        get() = SentimentAttachment(image)
+        get() = SentimentAttachment.fromImage(image)
 
     private val keyPhrasesAttachment: Attachment
-        get() = KeyPhrasesAttachment(image)
+        get() = KeyPhrasesAttachment.fromImage(image)
 
     private val entityAttachment: Attachment
-        get() = EntityAttachment(image)
+        get() = EntityAttachment.fromImage(image)
 
     companion object {
         //\u2022 == bullet point character

@@ -29,7 +29,7 @@ internal class SentimentAttachmentTest {
                 .sentimentTotals(sentimentTotals)
                 .sentimentScoreTotals(sentimentScoreTotals)
                 .build()
-        val testee = SentimentAttachment(image)
+        val testee = SentimentAttachment.fromImage(image)
         Assertions.assertThat(testee.pretext).isEqualTo(expectedPretext)
         Assertions.assertThat(testee.fields).hasSize(4).extracting("title")
                 .containsExactlyInAnyOrder("Negative", "Mixed", "Neutral", "Positive")
