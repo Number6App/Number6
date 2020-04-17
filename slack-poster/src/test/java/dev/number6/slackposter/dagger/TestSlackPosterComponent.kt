@@ -7,5 +7,5 @@ import javax.inject.Singleton
 @Component(modules = [SlackPortModule::class, FakeSlackPosterConfigurationModule::class, FakeHttpModule::class])
 @Singleton
 interface TestSlackPosterComponent : SlackPosterComponent {
-    val recordingHttpAdaptor: HttpPort?
+    val recordingHttpAdaptor: HttpPort
 }

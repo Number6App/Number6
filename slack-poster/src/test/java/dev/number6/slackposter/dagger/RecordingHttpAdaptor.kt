@@ -6,7 +6,7 @@ import dev.number6.slack.port.HttpPort
 import java.util.*
 
 class RecordingHttpAdaptor : HttpPort {
-    private val posts: MutableMap<String?, String?> = HashMap()
+    private val posts: MutableMap<String, String> = HashMap()
     override fun get(url: String, logger: LambdaLogger): CallResponse {
         return CallResponse("quack")
     }
@@ -16,7 +16,7 @@ class RecordingHttpAdaptor : HttpPort {
         return CallResponse("quack")
     }
 
-    fun getPosts(): Map<String?, String?> {
+    fun getPosts(): Map<String, String> {
         return posts
     }
 }
