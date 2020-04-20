@@ -2,7 +2,7 @@
   "Parameters": {
     "SlackChannel": "CVC7WTE2X",
     "SlackTokenSecretName": "no6/prod/slack/1",
-    "BlacklistedChannels": "meta,meta-test,emacs,docker",
+    "BlacklistedChannels": "meta,meta-test,emacs,docker,no6,no6-test",
     "EnvType": "prod"
   }
 }
