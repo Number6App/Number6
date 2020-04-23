@@ -8,9 +8,11 @@ import javax.inject.Inject
 class SlackService @Inject constructor(private val slackPort: SlackPort) {
 
     fun handleNewImage(image: ChannelSummaryImage, logger: LambdaLogger) {
-        logger.log("handling image: $image")
-        if (image.hasFinalUpdate()) {
-            slackPort.postMessageToChannel(PresentableChannelSummary(image), logger)
+        image.let {
+            logger.log("handling image: $it")
+            if (it.hasFinalUpdate()) {
+                slackPort.postMessageToChannel(PresentableChannelSummary(it), logger)
+            }
         }
     }
 }

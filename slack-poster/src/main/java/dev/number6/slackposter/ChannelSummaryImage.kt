@@ -8,44 +8,47 @@ class ChannelSummaryImage(private val vals: Map<String, AttributeValue>) {
         return valNamed(VERSION_KEY).n.toInt() >= FINAL_UPDATE_MINIMUM_VERSION
     }
 
-    val sentimentScoreTotals: Map<String, Double>
-        get() {
-            val sentimentScoreTotals = valNamed(SENTIMENT_SCORE_TOTALS).m
-            return sentimentScoreTotals.entries.stream()
-                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toDouble() }))
+    val sentimentScoreTotals: Map<String, Double> by lazy {
+            valNamed(SENTIMENT_SCORE_TOTALS).m
+                    .mapKeys { e -> e.key }
+                    .mapValues { e -> e.value.n.toDouble() }
+//            return sentimentScoreTotals.entries.stream()
+//                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toDouble() }))
         }
 
-    val sentimentTotals: Map<String, Int>
-        get() {
-            val sentimentTotals = valNamed(SENTIMENT_TOTALS_KEY).m
-            return sentimentTotals.entries.stream()
-                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toInt() }))
+    val sentimentTotals: Map<String, Int> by lazy {
+            valNamed(SENTIMENT_TOTALS_KEY).m
+                    .mapKeys { e -> e.key }
+                    .mapValues { e -> e.value.n.toInt() }
+//            return sentimentTotals.entries.stream()
+//                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toInt() }))
         }
 
-    val keyPhrasesTotals: Map<String, Int>
-        get() {
-            val keyPhrasesTotals = valNamed(KEYPHRASES_TOTALS_KEY).m
-            return keyPhrasesTotals.entries.stream()
-                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toInt() }))
-        }
+    val keyPhrasesTotals: Map<String, Int> by lazy {
+        valNamed(KEYPHRASES_TOTALS_KEY).m
+                .mapKeys { e -> e.key }
+                .mapValues { e -> e.value.n.toInt() }
+//            return keyPhrasesTotals.entries.stream()
+//                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toInt() }))
+    }
 
-    val channelName: String
-        get() = valNamed(CHANNEL_NAME_KEY).s
+    val channelName: String by lazy { valNamed(CHANNEL_NAME_KEY).s }
 
-    val comprehensionDate: String
-        get() = valNamed(COMPREHENSION_DATE_KEY).s
+    val comprehensionDate: String by lazy { valNamed(COMPREHENSION_DATE_KEY).s }
 
-    val entityTotals: Map<String, Map<String, Int>>
-        get() {
-            val entityTotals = valNamed(ENTITY_TOTALS_KEY).m
-            return entityTotals.entries.stream()
-                    .collect(Collectors.toMap({ e -> e.key },
-                            { e ->
-                                e.value.m.entries.stream()
-                                        .collect(Collectors.toMap({ e1 -> e1.key },
-                                                { e2 -> e2.value.n.toInt() }))
-                            }))
-        }
+    val entityTotals: Map<String, Map<String, Int>> by lazy {
+        val entityTotals = valNamed(ENTITY_TOTALS_KEY).m
+
+        entityTotals.mapKeys { e -> e.key }
+                .mapValues { e -> e.value.m.mapKeys { e1 -> e1.key }.mapValues { e1 -> e1.value.n.toInt() } }
+//        entityTotals.entries.stream()
+//                .collect(Collectors.toMap({ e -> e.key },
+//                        { e ->
+//                            e.value.m.entries.stream()
+//                                    .collect(Collectors.toMap({ e1 -> e1.key },
+//                                            { e2 -> e2.value.n.toInt() }))
+//                        }))
+    }
 
     private fun valNamed(key: String): AttributeValue {
         return vals[key] ?: error("Cannot find $key in $vals")
