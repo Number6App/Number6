@@ -1,34 +1,30 @@
 package dev.number6.slack.adaptor
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.google.gson.Gson
 import dev.number6.slack.CallResponse
 import dev.number6.slack.port.HttpPort
-import org.assertj.core.api.Assertions
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.jupiter.MockitoExtension
 import uk.org.fyodor.generators.Generator
 import uk.org.fyodor.generators.RDG
 import java.util.*
 
-@ExtendWith(MockitoExtension::class)
-@Disabled("replace Mockito")
+@ExtendWith(MockKExtension::class)
 internal class SlackClientAdaptorTest {
-    @Mock
-    var logger: LambdaLogger? = null
+    var logger: LambdaLogger = mockk(relaxUnitFun = true)
+    var http: HttpPort = mockk()
 
-    @Mock
-    var http: HttpPort? = null
+    val testee = SlackClientAdaptor(http)
 
-    @InjectMocks
-    var testee: SlackClientAdaptor? = null
     private val gson = Gson()
     private var testResponseObject: TestResponseObject? = null
     private val testObjectGenerator = TestObjectGenerator()
@@ -40,25 +36,25 @@ internal class SlackClientAdaptorTest {
 
     @Test
     fun requestWithResponseObject() {
-//            Mockito.`when`(http!![ArgumentMatchers.any(), ArgumentMatchers.any()]).thenReturn(CallResponse(gson.toJson(testResponseObject)))
-        val response = testee!!.getSlackResponse(SlackClientAdaptor.CHANNEL_LIST_URL, TestResponseObject::class.java, logger!!)
-        Assertions.assertThat(response.isPresent).isTrue()
-        Assertions.assertThat(response.get()).isEqualTo(testResponseObject)
+        every { http.get(any(), any()) } returns CallResponse(gson.toJson(testResponseObject))
+        val response = testee.getSlackResponse(SlackClientAdaptor.CHANNEL_LIST_URL, TestResponseObject::class.java, logger!!)
+        assertThat(response.isPresent).isTrue()
+        assertThat(response.get()).isEqualTo(testResponseObject)
     }
 
     @Test
     fun postWithBodyNoResponse() {
-        Mockito.`when`(http!!.post(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(CallResponse(gson.toJson(testResponseObject)))
-        val response = testee!!.getSlackResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, logger!!, "BODY")
-        Assertions.assertThat(response.isPresent).isFalse()
+        every { http.post(any(), any(), any()) } returns CallResponse(gson.toJson(testResponseObject))
+        val response = testee.getSlackResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, logger, "BODY")
+        assertThat(response.isPresent).isFalse()
     }
 
     @Test
     fun postWithBodyAndResponse() {
-        Mockito.`when`(http!!.post(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(CallResponse(gson.toJson(testResponseObject)))
-        val response = testee!!.getSlackResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, "BODY", TestResponseObject::class.java, logger!!)
-        Assertions.assertThat(response.isPresent).isTrue()
-        Assertions.assertThat(response.get()).isEqualTo(testResponseObject)
+        every { http.post(any(), any(), any()) } returns CallResponse(gson.toJson(testResponseObject))
+        val response = testee.getSlackResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, "BODY", TestResponseObject::class.java, logger!!)
+        assertThat(response.isPresent).isTrue()
+        assertThat(response.get()).isEqualTo(testResponseObject)
     }
 
     class TestResponseObject internal constructor(private val field1: Int, private val field2: String, private val field3: Double) {

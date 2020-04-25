@@ -1,53 +1,44 @@
 package dev.number6.slack.adaptor
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import dev.number6.slack.port.SecretsPort
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import okhttp3.*
 import org.apache.http.HttpHeaders
-import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.*
-import org.mockito.junit.jupiter.MockitoExtension
 import java.io.IOException
 
-@ExtendWith(MockitoExtension::class)
-@Disabled("replace Mockito")
+@ExtendWith(MockKExtension::class)
 internal class OkHttpAdaptorTest {
-    @Mock
-    var responseBody: ResponseBody? = null
+    private val call: Call = mockk()
+    private val logger: LambdaLogger = mockk()
+    private val client: Call.Factory = mockk()
+    private val secretsPort: SecretsPort = mockk()
 
-    @Mock
-    var call: Call? = null
-
-    @Mock
-    var logger: LambdaLogger? = null
-
-    @Mock
-    var client: Call.Factory? = null
-
-    @Mock
-    var secretsPort: SecretsPort? = null
-
-    @InjectMocks
-    var testee: OkHttpAdaptor? = null
+    val testee: OkHttpAdaptor = OkHttpAdaptor(client, secretsPort)
 
     @Test
     @Throws(IOException::class)
     fun addAuthBearerTokenToRequests() {
-        Mockito.`when`(client!!.newCall(ArgumentMatchers.any())).thenReturn(call)
-        Mockito.`when`(call!!.execute()).thenReturn(Response.Builder()
+        every { client.newCall(any()) } returns call
+        every { call.execute() } returns Response.Builder()
                 .body(ResponseBody.create(MediaType.parse("application/json"), "{}"))
                 .request(Request.Builder().url("http://google.com").build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("message")
-                .build())
-        val requestCaptor = ArgumentCaptor.forClass(Request::class.java)
-        Mockito.`when`(secretsPort!!.getSlackTokenSecret(logger!!)).thenReturn("secret")
-        testee!!.get("http://google.com", logger!!)
-        Mockito.verify(client)?.newCall(requestCaptor.capture())
-        Assertions.assertThat(requestCaptor.value.header(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer secret")
+                .build()
+        val requestCaptor = slot<Request>()
+        every { secretsPort.getSlackTokenSecret(logger) } returns "secret"
+        testee.get("http://google.com", logger)
+        verify { client.newCall(capture(requestCaptor)) }
+        assertThat(requestCaptor.captured.header(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer secret")
     }
 }

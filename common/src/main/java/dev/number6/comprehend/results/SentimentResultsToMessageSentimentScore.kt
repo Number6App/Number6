@@ -14,22 +14,22 @@ class SentimentResultsToMessageSentimentScore : Function<Collection<DetectSentim
     enum class Sentiment {
         MIXED {
             override fun getSentimentScore(result: DetectSentimentResult): Float {
-                return result.sentimentScore.mixed
+                return result.sentimentScore?.mixed ?: 0.0f
             }
         },
         POSITIVE {
             override fun getSentimentScore(result: DetectSentimentResult): Float {
-                return result.sentimentScore.positive
+                return result.sentimentScore?.positive ?: 0.0f
             }
         },
         NEGATIVE {
             override fun getSentimentScore(result: DetectSentimentResult): Float {
-                return result.sentimentScore.negative
+                return result.sentimentScore?.negative ?: 0.0f
             }
         },
         NEUTRAL {
             override fun getSentimentScore(result: DetectSentimentResult): Float {
-                return result.sentimentScore.neutral
+                return result.sentimentScore?.neutral ?: 0.0f
             }
         };
 

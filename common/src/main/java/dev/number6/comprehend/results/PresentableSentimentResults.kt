@@ -9,7 +9,8 @@ class PresentableSentimentResults @JvmOverloads constructor(comprehensionDate: L
                                                             private val sentimentResultsToMessageSentimentScore: SentimentResultsToMessageSentimentScore =
                                                                     SentimentResultsToMessageSentimentScore(),
                                                             private val sentimentResultsToMessageSentimentTotals: SentimentResultsToMessageSentimentTotals =
-                                                                    SentimentResultsToMessageSentimentTotals()) : ComprehensionResults<Collection<DetectSentimentResult>>(comprehensionDate, sentimentResults, channelName) {
+                                                                    SentimentResultsToMessageSentimentTotals()) :
+        ComprehensionResults<Collection<DetectSentimentResult>>(comprehensionDate, sentimentResults, channelName) {
     val sentimentTotals: Map<String, Int>
         get() = sentimentResultsToMessageSentimentTotals.apply(results)
 

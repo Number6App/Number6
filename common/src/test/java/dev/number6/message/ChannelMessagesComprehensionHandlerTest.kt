@@ -2,31 +2,27 @@ package dev.number6.message
 
 import dev.number6.comprehend.results.PresentableEntityResults
 import dev.number6.generate.CommonRDG
-import org.junit.jupiter.api.Disabled
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.jupiter.MockitoExtension
 
-@ExtendWith(MockitoExtension::class)
-@Disabled("replace Mockito")
+@ExtendWith(MockKExtension::class)
 internal class ChannelMessagesComprehensionHandlerTest {
-    @Mock
-    var resultsFunction: ChannelMessagesToComprehensionResultsFunction<PresentableEntityResults?>? = null
 
-    @Mock
-    var resultsConsumer: ComprehensionResultsConsumer<PresentableEntityResults?>? = null
+    private val resultsFunction: ChannelMessagesToComprehensionResultsFunction<PresentableEntityResults> = mockk()
+    private val resultsConsumer: ComprehensionResultsConsumer<PresentableEntityResults> = mockk(relaxUnitFun = true)
 
     @Test
     fun convertMessagesAndAppliesConsumer() {
         val channelMessages = CommonRDG.channelMessages().next()
         val results = CommonRDG.presentableEntityResults().next()
-        Mockito.`when`(resultsFunction!!.apply(ArgumentMatchers.any())).thenReturn(results)
-//        val testee = ChannelMessagesComprehensionHandler(resultsFunction, resultsConsumer)
-//        testee.handle(channelMessages)
-//        Mockito.verify(resultsFunction).apply(channelMessages)
-//        Mockito.verify(resultsConsumer).accept(results)
+        every { resultsFunction.apply(channelMessages.hint(PresentableEntityResults::class, 1)) } returns results
+        val testee = ChannelMessagesComprehensionHandler(resultsFunction, resultsConsumer)
+        testee.handle(channelMessages)
+        verify(exactly = 1) { resultsFunction.apply(channelMessages) }
+        verify(exactly = 1) { resultsConsumer.accept(results) }
     }
 }
