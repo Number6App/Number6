@@ -13,7 +13,7 @@ open class SlackReaderAdaptor(client: HttpPort) : SlackClientAdaptor(client), Sl
         val response = getSlackResponse(CHANNEL_LIST_URL,
                 ChannelsListResponse::class.java,
                 logger)
-        return if (response.isPresent) response.get().getChannels() else listOf()
+        return if (response.isPresent) response.get().channels else listOf()
     }
 
     override fun getMessagesForChannelOnDate(c: Channel, date: LocalDate, logger: LambdaLogger): Collection<Message> {
@@ -26,7 +26,7 @@ open class SlackReaderAdaptor(client: HttpPort) : SlackClientAdaptor(client), Sl
                     ChannelHistoryResponse::class.java,
                     logger)
             response.map { chr ->
-                chr.getMessages().filter { m -> m.text != null && m.text.isNotEmpty() }
+                chr.messages.filter { m -> m.text != null && m.text.isNotEmpty() }
                         .filter { m -> !m.isBotMessage() }
             }
                     .orElseGet { listOf() }

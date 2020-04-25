@@ -9,14 +9,13 @@ import java.time.LocalDate
 class SlackService(private val slackPort: SlackPort, private val config: SlackReaderConfigurationPort) {
     fun getMessagesOnDate(comprehensionDate: LocalDate, logger: LambdaLogger): WorkspaceMessages {
         val blacklistedChannels = config.getBlacklistedChannels()
-        return slackPort.getChannelList(logger).stream()
+        return slackPort.getChannelList(logger)
                 .filter { c -> !blacklistedChannels.contains(c.name) }
-                .reduce(WorkspaceMessages(comprehensionDate),
+                .fold(WorkspaceMessages(comprehensionDate),
                         { wm, c ->
                             wm.add(c.name,
                                     slackPort.getMessagesForChannelOnDate(c, comprehensionDate, logger)
                                             .map { m -> m.text })
-                        },
-                        { _, wm2 -> wm2 })
+                        })
     }
 }

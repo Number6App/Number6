@@ -8,11 +8,8 @@ import dev.number6.slackreader.generate.SlackReaderRDG
 import dev.number6.slackreader.model.Channel
 import dev.number6.slackreader.model.ChannelHistoryResponse
 import dev.number6.slackreader.model.ChannelsListResponse
-import dev.number6.slackreader.model.Message
 import okhttp3.*
 import org.apache.http.entity.ContentType
-import java.util.function.Function
-import java.util.stream.Collectors
 import javax.inject.Singleton
 
 @Module
@@ -85,7 +82,7 @@ class FakeCallFactoryModule {
         }
 
         fun getChannelNames(): Iterable<out String> {
-            return channelListResponse.getChannels().stream().map { c -> c.name }.collect(Collectors.toList())
+            return channelListResponse.channels.map { c -> c.name }
         }
 
         fun getNessagesForChannelName(channelName: String): Iterable<out String?> {
@@ -94,13 +91,13 @@ class FakeCallFactoryModule {
                     .findFirst()
                     .orElseThrow { RuntimeException("Unable to find history for channel name $channelName") }
                     .value
-                    .getMessages()
+                    .messages
                     .map { m -> m.text }
 
         }
 
         init {
-            channelMessages = channelListResponse.getChannels()
+            channelMessages = channelListResponse.channels
                     .associateWith { c -> SlackReaderRDG.channelHistoryResponse().next() }
         }
     }

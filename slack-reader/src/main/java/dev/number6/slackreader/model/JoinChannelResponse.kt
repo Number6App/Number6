@@ -9,11 +9,11 @@ class JoinChannelResponse(val ok: Boolean) {
     }
 
     companion object {
-        fun failed(): JoinChannelResponse? {
+        fun failed(): JoinChannelResponse {
             return JoinChannelResponse(false)
         }
 
-        fun ok(): JoinChannelResponse? {
+        fun ok(): JoinChannelResponse {
             return JoinChannelResponse(true)
         }
     }

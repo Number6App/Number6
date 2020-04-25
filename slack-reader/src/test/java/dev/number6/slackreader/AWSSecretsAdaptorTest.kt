@@ -7,41 +7,44 @@ import com.amazonaws.services.secretsmanager.AWSSecretsManager
 import com.amazonaws.services.secretsmanager.model.GetSecretValueResult
 import dev.number6.slack.adaptor.AWSSecretsAdaptor
 import dev.number6.slack.port.SecretsConfigurationPort
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
+import org.junit.jupiter.api.extension.ExtendWith
 import uk.org.fyodor.generators.RDG
 
+@ExtendWith(MockKExtension::class)
+
 internal class AWSSecretsAdaptorTest {
-    private val config = Mockito.mock(SecretsConfigurationPort::class.java)
-    private val aws = Mockito.mock(AWSSecretsManager::class.java)
-    private var testee: AWSSecretsAdaptor? = null
-    private var result: GetSecretValueResult? = null
-    private val logger = Mockito.mock(LambdaLogger::class.java)
+    private val config = mockk<SecretsConfigurationPort>()
+    private val aws = mockk<AWSSecretsManager>()
+    private var testee: AWSSecretsAdaptor = AWSSecretsAdaptor(aws, config)
+    private var result: GetSecretValueResult = GetSecretValueResult().withSecretString(SECRET_TOKEN)
+    private val logger = mockk<LambdaLogger>()
 
     @BeforeEach
     fun setup() {
-        result = GetSecretValueResult().withSecretString(SECRET_TOKEN)
-        Mockito.`when`(config.slackTokenSecretName).thenReturn(SECRET_NAME)
-        Mockito.`when`(aws.getSecretValue(ArgumentMatchers.any())).thenReturn(result)
+        every { config.slackTokenSecretName } returns SECRET_NAME
+        every { aws.getSecretValue(any()) } returns result
         testee = AWSSecretsAdaptor(aws, config)
     }
 
     @Test
     fun getSecretFromAWS() {
-        val secret = testee?.getSlackTokenSecret(logger)
+        val secret = testee.getSlackTokenSecret(logger)
         assertThat(secret).isEqualTo(SECRET_TOKEN)
     }
 
     @Test
     fun cacheSecretForFutureCalls() {
-        assertThat(testee?.getSlackTokenSecret(logger)).isEqualTo(SECRET_TOKEN)
-        result = GetSecretValueResult().withSecretString(RDG.string().next())
-        Mockito.`when`(aws.getSecretValue(ArgumentMatchers.any())).thenReturn(result)
-        assertThat(testee?.getSlackTokenSecret(logger)).isEqualTo(SECRET_TOKEN)
-        assertThat(testee?.getSlackTokenSecret(logger)).isEqualTo(SECRET_TOKEN)
+        assertThat(testee.getSlackTokenSecret(logger)).isEqualTo(SECRET_TOKEN)
+        val newResult = GetSecretValueResult().withSecretString(RDG.string().next())
+        every { aws.getSecretValue(any()) } returns newResult
+        assertThat(testee.getSlackTokenSecret(logger)).isEqualTo(SECRET_TOKEN)
+        assertThat(testee.getSlackTokenSecret(logger)).isEqualTo(SECRET_TOKEN)
     }
 
     companion object {

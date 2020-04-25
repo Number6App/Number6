@@ -1,13 +1,6 @@
 package dev.number6.slackreader.model
 
-class ChannelsListResponse(private val ok: Boolean?, private val channels: Collection<Channel>) {
-    fun getOk(): Boolean? {
-        return ok
-    }
-
-    fun getChannels(): Collection<Channel> {
-        return channels
-    }
+class ChannelsListResponse(val ok: Boolean?, val channels: Collection<Channel>) {
 
     override fun toString(): String {
         return "ChannelsListResponse{" +
