@@ -13,12 +13,12 @@ class FakeHttpAdaptor : HttpPort {
     private val gson = Gson()
     private val response: Map<String, Generator<String>>
     override fun get(url: String, logger: LambdaLogger): CallResponse {
-        val next = response[urlBeforeParameters(url)]?.next()
+        val next = response[urlBeforeParameters(url)]?.next() ?: ""
         return CallResponse(next)
     }
 
     override fun post(url: String, body: String, logger: LambdaLogger): CallResponse {
-        return CallResponse(response[urlBeforeParameters(url)]?.next())
+        return CallResponse(response[urlBeforeParameters(url)]?.next() ?: "")
     }
 
     private fun urlBeforeParameters(url: String): String {

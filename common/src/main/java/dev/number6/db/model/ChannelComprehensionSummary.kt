@@ -16,10 +16,10 @@ class ChannelComprehensionSummary {
 
     @DynamoDBTypeConverted(converter = LocalDateConverter::class)
     @DynamoDBRangeKey
-    var comprehensionDate: LocalDate? = null
+    lateinit var comprehensionDate: LocalDate
 
     @DynamoDBHashKey
-    var channelName: String? = null
+    lateinit var channelName: String
 
     //    @DynamoDBTypeConverted(converter = SentimentScoreConverter.class)
     @DynamoDBAttribute
@@ -40,7 +40,7 @@ class ChannelComprehensionSummary {
     var version: Int? = null
 
     constructor() {}
-    constructor(channelName: String?, comprehensionDate: LocalDate?) {
+    constructor(channelName: String, comprehensionDate: LocalDate) {
         this.channelName = channelName
         this.comprehensionDate = comprehensionDate
     }

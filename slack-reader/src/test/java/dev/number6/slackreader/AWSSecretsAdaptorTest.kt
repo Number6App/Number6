@@ -27,7 +27,7 @@ internal class AWSSecretsAdaptorTest {
 
     @BeforeEach
     fun setup() {
-        every { config.slackTokenSecretName } returns SECRET_NAME
+        every { config.getSlackTokenSecretName() } returns SECRET_NAME
         every { aws.getSecretValue(any()) } returns result
         testee = AWSSecretsAdaptor(aws, config)
     }
@@ -48,7 +48,7 @@ internal class AWSSecretsAdaptorTest {
     }
 
     companion object {
-        private val SECRET_NAME: String? = "Secret Name"
-        private val SECRET_TOKEN: String? = "Secret Token"
+        private const val SECRET_NAME: String = "Secret Name"
+        private const val SECRET_TOKEN: String = "Secret Token"
     }
 }
