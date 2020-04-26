@@ -22,5 +22,4 @@ class AwsComprehendClient(private val comprehendClient: AmazonComprehend) {
     companion object {
         private const val LANGUAGE_CODE = "en"
     }
-
 }

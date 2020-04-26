@@ -1,6 +1,8 @@
 package dev.number6.db
 
 import assertk.assertThat
+import assertk.assertions.containsOnly
+import assertk.assertions.extracting
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import dev.number6.db.TestDynamoDatabaseAdaptorComponent.FakeDynamoDBMapper
@@ -21,9 +23,9 @@ class DynamoDatabaseAdaptorIntegrationTest {
         val mapper = component.fakeDynamoDBMapper as FakeDynamoDBMapper
         component.database.createNewSummaryForChannels(channelNames, LocalDate.now())
         assertThat(mapper.saved).hasSize(channelNames.size)
-        //TODO
-//                .extracting("channelName")
-//                .containsExactlyInAnyOrder(*channelNames.toTypedArray())
+        assertThat(mapper.saved)
+                .extracting(ChannelComprehensionSummary::channelName)
+                .containsOnly(*channelNames.toTypedArray())
     }
 
     @Test
