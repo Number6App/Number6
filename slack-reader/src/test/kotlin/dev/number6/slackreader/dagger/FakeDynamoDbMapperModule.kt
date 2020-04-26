@@ -6,14 +6,12 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression
 import dagger.Module
 import dagger.Provides
-import dev.number6.db.port.DatabaseConfigurationPort
-import java.util.*
 import javax.inject.Singleton
 
 @Module
 class FakeDynamoDbMapperModule {
     @Provides
-    fun providesDbMapper(dbConfig: DatabaseConfigurationPort, client: FakeAmazonDynamoDB): DynamoDBMapper {
+    fun providesDbMapper(client: FakeAmazonDynamoDB): DynamoDBMapper {
         return object : DynamoDBMapper(client) {
             override fun <T> save(obj: T, saveExpression: DynamoDBSaveExpression?, config: DynamoDBMapperConfig?) {
                 client.save(obj!!)

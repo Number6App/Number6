@@ -2,9 +2,7 @@ package dev.number6.entity.dagger
 
 import dagger.Module
 import dagger.Provides
-import dev.number6.comprehend.port.ComprehensionPort
 import dev.number6.comprehend.results.PresentableEntityResults
-import dev.number6.db.port.DatabasePort
 import dev.number6.message.ChannelMessages
 import dev.number6.message.ChannelMessagesToComprehensionResultsFunction
 import dev.number6.message.ComprehensionResultsConsumer
@@ -16,13 +14,13 @@ import javax.inject.Singleton
 class FakeComprehensionResultsModule {
     @Provides
     @Singleton
-    fun providesMessageToEntityResults(comprehensionPort: ComprehensionPort): ChannelMessagesToComprehensionResultsFunction<PresentableEntityResults> {
+    fun providesMessageToEntityResults(): ChannelMessagesToComprehensionResultsFunction<PresentableEntityResults> {
         return ConfigurableResultsFunction()
     }
 
     @Provides
     @Singleton
-    fun providesEntityResultsConsumer(databasePort: DatabasePort): ComprehensionResultsConsumer<PresentableEntityResults> {
+    fun providesEntityResultsConsumer(): ComprehensionResultsConsumer<PresentableEntityResults> {
         return RecordingComprehensionResultsConsumer()
     }
 

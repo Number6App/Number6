@@ -37,7 +37,7 @@ internal class SlackClientAdaptorTest {
     @Test
     fun requestWithResponseObject() {
         every { http.get(any(), any()) } returns CallResponse(gson.toJson(testResponseObject))
-        val response = testee.getSlackResponse(SlackClientAdaptor.CHANNEL_LIST_URL, TestResponseObject::class.java, logger!!)
+        val response = testee.getSlackResponse(SlackClientAdaptor.CHANNEL_LIST_URL, TestResponseObject::class.java, logger)
         assertThat(response.isPresent).isTrue()
         assertThat(response.get()).isEqualTo(testResponseObject)
     }
@@ -52,16 +52,16 @@ internal class SlackClientAdaptorTest {
     @Test
     fun postWithBodyAndResponse() {
         every { http.post(any(), any(), any()) } returns CallResponse(gson.toJson(testResponseObject))
-        val response = testee.getSlackResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, "BODY", TestResponseObject::class.java, logger!!)
+        val response = testee.getSlackResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, "BODY", TestResponseObject::class.java, logger)
         assertThat(response.isPresent).isTrue()
         assertThat(response.get()).isEqualTo(testResponseObject)
     }
 
     class TestResponseObject internal constructor(private val field1: Int, private val field2: String, private val field3: Double) {
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val that = o as TestResponseObject
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || javaClass != other.javaClass) return false
+            val that = other as TestResponseObject
             return field1 == that.field1 &&
                     field2 == that.field2 &&
                     field3 == that.field3

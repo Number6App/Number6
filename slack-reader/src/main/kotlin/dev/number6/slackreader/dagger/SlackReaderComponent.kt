@@ -9,5 +9,5 @@ import dev.number6.slackreader.SlackReader
 
 @Component(modules = [SlackServiceModule::class, SlackPortModule::class, HttpModule::class, DatabasePortModule::class, DatabaseConfigurationPortModule::class, DynamoDBMapperModule::class, AmazonSnsModule::class, ConfigurationPortModule::class, ClockModule::class])
 interface SlackReaderComponent {
-    open fun handler(): SlackReader
+    fun handler(): SlackReader
 }

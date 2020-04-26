@@ -6,5 +6,5 @@ import dev.number6.message.ChannelMessagesHandler
 
 @Component(modules = [CommonModule::class, ChannelMessagesHandlerModule::class, ComprehensionResultsModule::class])
 interface ChannelMessagesSentimentComprehensionComponent {
-    open fun getChannelMessagesHandler(): ChannelMessagesHandler
+    fun getChannelMessagesHandler(): ChannelMessagesHandler
 }

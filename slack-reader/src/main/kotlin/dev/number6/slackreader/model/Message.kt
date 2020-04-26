@@ -23,10 +23,10 @@ class Message @JvmOverloads constructor(val type: String,
                 '}'
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val message = o as Message
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val message = other as Message
         return type == message.type &&
                 subtype == message.subtype && text == message.text
     }

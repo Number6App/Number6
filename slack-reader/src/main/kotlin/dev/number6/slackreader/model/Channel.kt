@@ -11,10 +11,10 @@ class Channel(val id: String, val name: String) {
                 '}'
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val channel = o as Channel
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val channel = other as Channel
         return id == channel.id &&
                 name == channel.name
     }

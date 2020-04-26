@@ -81,11 +81,11 @@ class FakeCallFactoryModule {
             return Datasource.getDatasourceForRequest(request).getData(this, request)
         }
 
-        fun getChannelNames(): Iterable<out String> {
+        fun getChannelNames(): Iterable<String> {
             return channelListResponse.channels.map { c -> c.name }
         }
 
-        fun getNessagesForChannelName(channelName: String): Iterable<out String?> {
+        fun getNessagesForChannelName(channelName: String): Iterable<String?> {
             return channelMessages.entries.stream()
                     .filter { e -> e.key.name == channelName }
                     .findFirst()
@@ -98,7 +98,7 @@ class FakeCallFactoryModule {
 
         init {
             channelMessages = channelListResponse.channels
-                    .associateWith { c -> SlackReaderRDG.channelHistoryResponse().next() }
+                    .associateWith { _ -> SlackReaderRDG.channelHistoryResponse().next() }
         }
     }
 

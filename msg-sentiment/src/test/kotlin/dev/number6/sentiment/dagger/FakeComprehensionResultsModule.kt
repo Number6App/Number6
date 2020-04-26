@@ -16,13 +16,13 @@ import javax.inject.Singleton
 class FakeComprehensionResultsModule {
     @Provides
     @Singleton
-    fun providesMessageToSentimentResults(comprehensionPort: ComprehensionPort): ChannelMessagesToComprehensionResultsFunction<PresentableSentimentResults> {
+    fun providesMessageToSentimentResults(): ChannelMessagesToComprehensionResultsFunction<PresentableSentimentResults> {
         return ConfigurableResultsFunction()
     }
 
     @Provides
     @Singleton
-    fun providesSentimentResultsConsumer(databasePort: DatabasePort): ComprehensionResultsConsumer<PresentableSentimentResults> {
+    fun providesSentimentResultsConsumer(): ComprehensionResultsConsumer<PresentableSentimentResults> {
         return RecordingComprehensionResultsConsumer()
     }
 

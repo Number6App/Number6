@@ -20,9 +20,9 @@ import javax.inject.Singleton
     FakeClockModule::class])
 @Singleton
 interface TestSlackReaderComponent : SlackReaderComponent {
-    open fun getFakeHttpAdaptor(): HttpPort
-    open fun getFakeAmazonDynamoClient(): FakeDynamoDbMapperModule.FakeAmazonDynamoDB
-    open fun getFakeAmazonSns(): FakeAmazonSns
-    open fun getClock(): Clock
-    open fun getSlackPort(): SlackPort
+    fun getFakeHttpAdaptor(): HttpPort
+    fun getFakeAmazonDynamoClient(): FakeDynamoDbMapperModule.FakeAmazonDynamoDB
+    fun getFakeAmazonSns(): FakeAmazonSns
+    fun getClock(): Clock
+    fun getSlackPort(): SlackPort
 }

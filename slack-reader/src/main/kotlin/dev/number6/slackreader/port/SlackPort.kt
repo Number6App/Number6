@@ -7,6 +7,6 @@ import dev.number6.slackreader.model.Message
 import java.time.LocalDate
 
 interface SlackPort {
-    open fun getChannelList(logger: LambdaLogger): Collection<Channel>
-    open fun getMessagesForChannelOnDate(c: Channel, date: LocalDate, logger: LambdaLogger): Collection<Message>
+    fun getChannelList(logger: LambdaLogger): Collection<Channel>
+    fun getMessagesForChannelOnDate(c: Channel, date: LocalDate, logger: LambdaLogger): Collection<Message>
 }

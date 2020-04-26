@@ -29,26 +29,26 @@ class DynamoDatabaseAdaptorIntegrationTest {
     @Test
     fun saveEntityResults() {
         val results = CommonRDG.presentableEntityResults().next()
-        val summary = saveResults(Consumer { m: DatabasePort? -> m!!.save(results!!) })
-        assertThat(summary!!.entityTotals).isEqualTo(results!!.results)
+        val summary = saveResults(Consumer { m -> m.save(results) })
+        assertThat(summary.entityTotals).isEqualTo(results.results)
     }
 
     @Test
     fun saveSentimentResults() {
         val results = CommonRDG.presentableSentimentResults().next()
-        val summary = saveResults(Consumer { m: DatabasePort? -> m!!.save(results!!) })
-        assertThat(summary!!.sentimentTotals).isEqualTo(results!!.sentimentTotals)
+        val summary = saveResults(Consumer { m -> m.save(results) })
+        assertThat(summary.sentimentTotals).isEqualTo(results.sentimentTotals)
         assertThat(summary.sentimentScoreTotals).isEqualTo(results.sentimentScoreTotals)
     }
 
     @Test
     fun saveKeyPhrasesResults() {
         val results = CommonRDG.presentableKeyPhrasesResults().next()
-        val summary = saveResults(Consumer { m: DatabasePort? -> m!!.save(results!!) })
-        assertThat(summary!!.keyPhrasesTotals).isEqualTo(results!!.results)
+        val summary = saveResults(Consumer { m -> m.save(results) })
+        assertThat(summary.keyPhrasesTotals).isEqualTo(results.results)
     }
 
-    private fun saveResults(resultsConsumer: Consumer<DatabasePort?>): ChannelComprehensionSummary? {
+    private fun saveResults(resultsConsumer: Consumer<DatabasePort>): ChannelComprehensionSummary {
         val mapper = component.fakeDynamoDBMapper as FakeDynamoDBMapper
         resultsConsumer.accept(component.database)
         assertThat(mapper.saved).hasSize(1)
