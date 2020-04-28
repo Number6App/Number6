@@ -12,19 +12,16 @@ import javax.inject.Singleton
 @Module
 class ComprehensionServiceModule {
     @Provides
-    @Singleton
     fun providesComprehensionPort(client: AwsComprehendClient): ComprehensionPort {
         return AwsComprehensionAdaptor(client)
     }
 
     @Provides
-    @Singleton
     fun providesComprehensionClient(amazonComprehend: AmazonComprehend): AwsComprehendClient {
         return AwsComprehendClient(amazonComprehend)
     }
 
     @Provides
-    @Singleton
     fun providesAmazonComprehend(): AmazonComprehend {
         return AmazonComprehendClientBuilder.defaultClient()
     }

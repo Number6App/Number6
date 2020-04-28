@@ -2,7 +2,7 @@ package dev.number6.slackposter
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import dev.number6.slackposter.model.ChannelSummaryImageBuilder
-import dev.number6.slackposter.port.SlackPort
+import dev.number6.slackposter.port.SlackPosterPort
 import io.mockk.Called
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -16,22 +16,22 @@ internal class SlackServiceTest {
 
     private val logger: LambdaLogger = mockk(relaxUnitFun = true)
 
-    private val slackPort: SlackPort = mockk(relaxUnitFun = true)
+    private val slackPosterPort: SlackPosterPort = mockk(relaxUnitFun = true)
 
     @Test
     @Throws(IOException::class)
     fun postToSlackIfLastUpdate() {
-        val testee = SlackService(slackPort)
+        val testee = SlackService(slackPosterPort)
         val image: ChannelSummaryImage = ChannelSummaryImageBuilder.finalImage().build()
         testee.handleNewImage(image, logger)
-        verify { slackPort.postMessageToChannel(any(), any()) }
+        verify { slackPosterPort.postMessageToChannel(any(), any()) }
     }
 
     @Test
     fun doNotPostToSlackIfNotLastUpdate() {
-        val testee = SlackService(slackPort)
+        val testee = SlackService(slackPosterPort)
         val image: ChannelSummaryImage = ChannelSummaryImageBuilder.notFinalImage().build()
         testee.handleNewImage(image, logger)
-        verify { slackPort wasNot Called }
+        verify { slackPosterPort wasNot Called }
     }
 }

@@ -14,6 +14,7 @@
         <module>msg-sentiment</module>
         <module>slack-poster</module>
         <module>slack-reader</module>
+        <module>slack</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -253,7 +254,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.3</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                 </configuration>
@@ -263,6 +264,9 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

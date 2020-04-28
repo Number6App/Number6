@@ -11,5 +11,4 @@ class SnsService(private val notifications: NotificationPort) {
                 .map { m -> ChannelMessages(m, messages.getMessagesForChannel(m), messages.comprehensionDate) }
                 .forEach { cm -> notifications.broadcast(cm) }
     }
-
 }

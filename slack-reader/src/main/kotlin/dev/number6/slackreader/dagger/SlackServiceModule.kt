@@ -7,7 +7,7 @@ import dev.number6.slackreader.SlackService
 import dev.number6.slackreader.SnsService
 import dev.number6.slackreader.adaptor.SnsNotificationAdaptor
 import dev.number6.slackreader.port.NotificationPort
-import dev.number6.slackreader.port.SlackPort
+import dev.number6.slackreader.port.SlackReaderPort
 import dev.number6.slackreader.port.SlackReaderConfigurationPort
 
 @Module
@@ -23,7 +23,7 @@ class SlackServiceModule {
     }
 
     @Provides
-    fun slackService(slackPort: SlackPort, config: SlackReaderConfigurationPort): SlackService {
-        return SlackService(slackPort, config)
+    fun slackService(slackReaderPort: SlackReaderPort, config: SlackReaderConfigurationPort): SlackService {
+        return SlackService(slackReaderPort, config)
     }
 }

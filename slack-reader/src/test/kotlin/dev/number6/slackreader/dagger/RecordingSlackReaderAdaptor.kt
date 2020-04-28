@@ -1,13 +1,13 @@
 package dev.number6.slackreader.dagger
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import dev.number6.slack.port.HttpPort
+import dev.number6.slack.adaptor.SlackClientAdaptor
 import dev.number6.slackreader.adaptor.SlackReaderAdaptor
 import dev.number6.slackreader.model.Channel
 import dev.number6.slackreader.model.Message
 import java.time.LocalDate
 
-class RecordingSlackReaderAdaptor(client: HttpPort) : SlackReaderAdaptor(client) {
+class RecordingSlackReaderAdaptor(client: SlackClientAdaptor) : SlackReaderAdaptor(client) {
     private var channelNames: List<String> = listOf()
     private val channelMessages: MutableMap<String?, List<String?>> = mutableMapOf()
     override fun getChannelList(logger: LambdaLogger): Collection<Channel> {

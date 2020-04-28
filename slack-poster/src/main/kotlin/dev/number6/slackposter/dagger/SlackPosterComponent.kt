@@ -1,10 +1,13 @@
 package dev.number6.slackposter.dagger
 
 import dagger.Component
-import dev.number6.slack.dagger.HttpModule
+import dev.number6.slack.dagger.SlackClientLiveBindingsModule
+import dev.number6.slack.dagger.SlackClientModule
 import dev.number6.slackposter.SlackService
 
-@Component(modules = [SlackPortModule::class, SlackPosterConfigurationModule::class, HttpModule::class])
+@Component(modules = [SlackPosterPortModule::class,
+    SlackPosterConfigurationModule::class,
+    SlackClientLiveBindingsModule::class])
 interface SlackPosterComponent {
     fun handler(): SlackService
 }

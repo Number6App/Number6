@@ -5,15 +5,11 @@ import assertk.assertions.containsOnly
 import assertk.assertions.isNotNull
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.google.gson.Gson
-import dev.number6.slack.CallResponse
 import dev.number6.slack.adaptor.SlackClientAdaptor
-import dev.number6.slack.port.HttpPort
+import dev.number6.slack.port.SlackPort
 import dev.number6.slackreader.adaptor.SlackReaderAdaptor
 import dev.number6.slackreader.generate.SlackReaderRDG
-import dev.number6.slackreader.model.Channel
-import dev.number6.slackreader.model.ChannelHistoryResponse
-import dev.number6.slackreader.model.JoinChannelResponse
-import dev.number6.slackreader.model.Message
+import dev.number6.slackreader.model.*
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -24,15 +20,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import uk.org.fyodor.generators.RDG
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.util.*
 
 @ExtendWith(MockKExtension::class)
 internal class SlackReaderAdaptorTest {
     private val gson = Gson()
 
-    private val httpClient = mockk<HttpPort>()
+    private val slackPort = mockk<SlackPort>()
 
     private val logger = mockk<LambdaLogger>(relaxUnitFun = true)
-    private val testee = SlackReaderAdaptor(httpClient)
+    private val testee = SlackReaderAdaptor(slackPort)
 
     @Test
     fun getListOfSlackChannels() {
@@ -40,7 +37,7 @@ internal class SlackReaderAdaptorTest {
         val expectedChannels = channelsListResponse.channels
         prepareHttpGetCallMock(channelsListResponse)
         val channels = testee.getChannelList(logger)
-        verify(exactly = 1) { httpClient.get(SlackClientAdaptor.CHANNEL_LIST_URL, logger) }
+        verify(exactly = 1) { slackPort.getSlackResponse(SlackClientAdaptor.CHANNEL_LIST_URL, ChannelsListResponse::class.java, logger) }
 
         assertThat(channels).isNotNull()
                 .containsOnly(*expectedChannels.toTypedArray())
@@ -57,8 +54,8 @@ internal class SlackReaderAdaptorTest {
         prepareHttpPostCallMock(JoinChannelResponse.Companion.ok())
         val messages = testee.getMessagesForChannelOnDate(channel, messagesDate, logger)
         verifyOrder {
-            httpClient.post(joinChannelUrl, "", logger)
-            httpClient.get(channelHistoryUrl, logger)
+            slackPort.callSlack(joinChannelUrl, "", JoinChannelResponse::class.java, logger)
+            slackPort.getSlackResponse(channelHistoryUrl, ChannelHistoryResponse::class.java, logger)
         }
         assertThat(messages).containsOnly(*expectedChannelHistory.messages.toTypedArray())
     }
@@ -87,7 +84,7 @@ internal class SlackReaderAdaptorTest {
         prepareHttpGetCallMock(response)
         prepareHttpPostCallMock(JoinChannelResponse.ok())
         val messages = testee.getMessagesForChannelOnDate(channel, messagesDate, logger)
-        verify { httpClient.get(url, logger) }
+        verify { slackPort.getSlackResponse(url, ChannelHistoryResponse::class.java, logger) }
         assertThat(messages).containsOnly(*expectedChannelHistory.messages.toTypedArray())
     }
 
@@ -109,7 +106,7 @@ internal class SlackReaderAdaptorTest {
         prepareHttpGetCallMock(response)
         prepareHttpPostCallMock(JoinChannelResponse.ok())
         val messages = testee.getMessagesForChannelOnDate(channel, messagesDate, logger)
-        verify { httpClient.get(url, logger) }
+        verify { slackPort.getSlackResponse(url, ChannelHistoryResponse::class.java, logger) }
         assertThat(messages).containsOnly(*expectedChannelHistory.messages.toTypedArray())
     }
 
@@ -122,11 +119,11 @@ internal class SlackReaderAdaptorTest {
         return String.format(SlackClientAdaptor.JOIN_CHANNEL_URL, channel.id)
     }
 
-    private fun prepareHttpGetCallMock(body: Any?) {
-        every { httpClient.get(any(), any()) } returns CallResponse(gson.toJson(body))
+    private fun <T> prepareHttpGetCallMock(body: T) {
+        every { slackPort.getSlackResponse(any(), any<Class<T>>(), any()) } returns Optional.of(body)
     }
 
-    private fun prepareHttpPostCallMock(body: Any) {
-        every { httpClient.post(any(), any(), any()) } returns CallResponse(gson.toJson(body))
+    private fun <T> prepareHttpPostCallMock(body: T) {
+        every { slackPort.callSlack(any(), any(), any<Class<T>>(), any()) } returns Optional.of(body)
     }
 }

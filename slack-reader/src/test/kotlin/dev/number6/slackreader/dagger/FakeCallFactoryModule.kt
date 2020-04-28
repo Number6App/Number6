@@ -1,19 +1,31 @@
 package dev.number6.slackreader.dagger
 
+import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dev.number6.slack.adaptor.SlackClientAdaptor
+import dev.number6.slack.port.SecretsPort
 import dev.number6.slackreader.generate.SlackReaderRDG
 import dev.number6.slackreader.model.Channel
 import dev.number6.slackreader.model.ChannelHistoryResponse
 import dev.number6.slackreader.model.ChannelsListResponse
+import dev.number6.slackreader.model.JoinChannelResponse
 import okhttp3.*
 import org.apache.http.entity.ContentType
 import javax.inject.Singleton
 
 @Module
 class FakeCallFactoryModule {
+
+    @Provides
+    fun providesFakeSecretsPort(): SecretsPort {
+        return object : SecretsPort {
+            override fun getSlackTokenSecret(logger: LambdaLogger): String {
+                return "SlackTokenSecret"
+            }
+        }
+    }
 
     @Provides
     @Singleton
@@ -34,6 +46,15 @@ class FakeCallFactoryModule {
 
             override fun getData(fakeCallData: FakeCallData, request: Request): String {
                 return fakeCallData.getChannelListResponse()
+            }
+        },
+        JoinChannel {
+            override fun canHandle(request: Request): Boolean {
+                return request.url().toString().startsWith("https://slack.com/api/conversations.join")
+            }
+
+            override fun getData(fakeCallData: FakeCallData, request: Request): String {
+                return fakeCallData.getJoinedChannelResponse()
             }
         },
         ChannelMessages {
@@ -67,6 +88,10 @@ class FakeCallFactoryModule {
         private val gson = Gson()
         fun getChannelListResponse(): String {
             return gson.toJson(channelListResponse)
+        }
+
+        fun getJoinedChannelResponse(): String {
+            return gson.toJson(JoinChannelResponse(true))
         }
 
         fun getChannelHistoryResponse(channelId: String?): String {
@@ -141,6 +166,5 @@ class FakeCallFactoryModule {
                 }
             }
         }
-
     }
 }
