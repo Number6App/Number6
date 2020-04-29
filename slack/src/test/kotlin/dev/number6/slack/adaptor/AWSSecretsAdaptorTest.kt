@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.amazonaws.services.secretsmanager.AWSSecretsManager
 import com.amazonaws.services.secretsmanager.model.GetSecretValueResult
-import dev.number6.slack.port.SecretsConfigurationPort
+import dev.number6.slack.port.SlackConfigurationPort
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -17,7 +17,7 @@ import uk.org.fyodor.generators.RDG
 
 @ExtendWith(MockKExtension::class)
 internal class AWSSecretsAdaptorTest {
-    private val config = mockk<SecretsConfigurationPort>()
+    private val config = mockk<SlackConfigurationPort>()
     private val aws = mockk<AWSSecretsManager>()
     private var testee: AWSSecretsAdaptor = AWSSecretsAdaptor(aws, config)
     private var result: GetSecretValueResult = GetSecretValueResult().withSecretString(SECRET_TOKEN)
@@ -25,7 +25,7 @@ internal class AWSSecretsAdaptorTest {
 
     @BeforeEach
     fun setup() {
-        every { config.getSlackTokenSecretName() } returns SECRET_NAME
+        every { config.slackTokenSecretName } returns SECRET_NAME
         every { aws.getSecretValue(any()) } returns result
         testee = AWSSecretsAdaptor(aws, config)
     }

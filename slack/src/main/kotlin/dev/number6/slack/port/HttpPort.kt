@@ -1,7 +1,7 @@
 package dev.number6.slack.port
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import dev.number6.slack.CallResponse
+import dev.number6.slack.model.CallResponse
 
 internal interface HttpPort {
     fun get(url: String, logger: LambdaLogger): CallResponse

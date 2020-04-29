@@ -14,11 +14,8 @@ class SlackPosterAdaptor(private val client: SlackPort,
     override fun postMessageToChannel(summary: PresentableChannelSummary, logger: LambdaLogger) {
         logger.log("creating content for post to Slack: " + summary.initialMessageLine + ", " + summary.attachments.contentToString())
         val content = gson.toJson(Chat(config.postingChannelId, summary.initialMessageLine, *summary.attachments))
-        logger.log("posting to Slack...")
-        val response = client.postToSlackNoResponse(config.slackPostMessageUrl,
-                logger,
-                content)
-        logger.log("Response from post to Slack: " + response.orElse("no response"))
+        logger.log("posting content to Slack: $content")
+        client.postMessageToChannel(content, logger)
     }
 
 }

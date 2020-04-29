@@ -1,13 +1,10 @@
 package dev.number6.slack
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger
+import dev.number6.slack.model.CallResponse
 import dev.number6.slack.port.HttpPort
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Request
-import okhttp3.Response
 
-class FakeHttpAdaptor : HttpPort {
+internal class FakeHttpAdaptor : HttpPort {
     private var response = "response"
     override fun get(url: String, logger: LambdaLogger): CallResponse {
         return CallResponse(response)

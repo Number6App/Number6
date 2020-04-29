@@ -1,7 +1,7 @@
 package dev.number6.slack.adaptor
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import dev.number6.slack.CallResponse
+import dev.number6.slack.model.CallResponse
 import dev.number6.slack.port.HttpPort
 import dev.number6.slack.port.SecretsPort
 import okhttp3.Call
@@ -12,7 +12,6 @@ import org.apache.http.HttpHeaders
 import org.apache.http.entity.ContentType
 import java.io.IOException
 import java.util.*
-import javax.inject.Inject
 
 internal class OkHttpAdaptor(private val client: Call.Factory,
                              private val secretsPort: SecretsPort) : HttpPort {

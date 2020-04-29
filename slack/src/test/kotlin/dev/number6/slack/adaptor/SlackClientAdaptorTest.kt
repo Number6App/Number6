@@ -6,11 +6,12 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.google.gson.Gson
-import dev.number6.slack.CallResponse
+import dev.number6.slack.model.CallResponse
 import dev.number6.slack.port.HttpPort
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,6 +33,18 @@ internal class SlackClientAdaptorTest {
     @BeforeEach
     fun setup() {
         testResponseObject = testObjectGenerator.next()
+    }
+
+    @Test
+    fun postMessageToSlackChannel() {
+        every { http.post(any(), any(), any()) } returns CallResponse(gson.toJson(testResponseObject))
+        val content = RDG.string().next()
+        testee.postMessageToChannel(content, logger)
+        verify {
+            http.post(SlackClientAdaptor.POST_MESSAGE_URL,
+                    content,
+                    logger)
+        }
     }
 
     @Test

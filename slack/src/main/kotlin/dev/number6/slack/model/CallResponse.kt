@@ -1,6 +1,6 @@
-package dev.number6.slack
+package dev.number6.slack.model
 
-class CallResponse {
+internal class CallResponse {
     val isSuccess: Boolean
     private val value: String
 

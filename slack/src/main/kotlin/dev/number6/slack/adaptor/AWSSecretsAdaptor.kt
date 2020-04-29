@@ -4,10 +4,10 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.amazonaws.services.secretsmanager.AWSSecretsManager
 import com.amazonaws.services.secretsmanager.model.*
 import com.google.gson.Gson
-import dev.number6.slack.port.SecretsConfigurationPort
 import dev.number6.slack.port.SecretsPort
+import dev.number6.slack.port.SlackConfigurationPort
 
-internal class AWSSecretsAdaptor(private val aws: AWSSecretsManager, private val config: SecretsConfigurationPort) : SecretsPort {
+internal class AWSSecretsAdaptor(private val aws: AWSSecretsManager, private val config: SlackConfigurationPort) : SecretsPort {
     private val gson = Gson()
     private var secret: String? = null
     override fun getSlackTokenSecret(logger: LambdaLogger): String {
@@ -16,7 +16,7 @@ internal class AWSSecretsAdaptor(private val aws: AWSSecretsManager, private val
 
     private fun retrieveSecretKeyValue(logger: LambdaLogger): String {
         if (secret == null) {
-            val secretName = config.getSlackTokenSecretName()
+            val secretName = config.slackTokenSecretName
             val getSecretValueRequest = GetSecretValueRequest().withSecretId(secretName)
             var getSecretValueResult: GetSecretValueResult? = null
             try {

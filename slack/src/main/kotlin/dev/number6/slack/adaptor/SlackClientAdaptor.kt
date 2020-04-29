@@ -23,9 +23,14 @@ class SlackClientAdaptor @Inject internal constructor(private val client: HttpPo
         return if (responseType == null || !response.isSuccess) Optional.empty() else Optional.of(gson.fromJson(response.body(), responseType))
     }
 
+    override fun postMessageToChannel(content: String, logger: LambdaLogger) {
+        postToSlackNoResponse(POST_MESSAGE_URL, logger, content)
+    }
+
     companion object {
         const val CHANNEL_LIST_URL = "https://slack.com/api/channels.list"
         const val CHANNEL_HISTORY_URL = "https://slack.com/api/channels.history?count=1000&channel=%s&oldest=%s&latest=%s"
         const val JOIN_CHANNEL_URL = "https://slack.com/api/conversations.join?channel=%s"
+        const val POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage"
     }
 }

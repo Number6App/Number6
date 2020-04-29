@@ -2,11 +2,13 @@ package dev.number6.slackposter
 
 import assertk.assertThat
 import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.google.gson.Gson
 import dev.number6.slackposter.dagger.DaggerTestSlackPosterComponent
 import dev.number6.slackposter.dagger.RecordingSlackPosterAdaptor
 import dev.number6.slackposter.model.ChannelSummaryImageBuilder
+import dev.number6.slackposter.model.PresentableChannelSummary
 import org.junit.jupiter.api.Test
 
 class SlackPosterComponentIntegrationTest {
@@ -20,10 +22,14 @@ class SlackPosterComponentIntegrationTest {
         service.handleNewImage(image, FakeLambdaLogger())
         val http = testee.recordingHttpAdaptor() as RecordingSlackPosterAdaptor
         assertThat(http.posts).hasSize(1)
-//        val chat = gson.fromJson(http.posts[FakeSlackPosterConfigurationModule.SLACK_POST_MESSAGE_URL],
-//                Chat::class.java)
-//        assertThat(chat.text).isEqualTo(PresentableChannelSummary(image).initialMessageLine)
-//        assertThat(chat.channel).isEqualTo(FakeSlackPosterConfigurationModule.POSTING_CHANNEL_ID)
+        val chat = http.posts[0]
+        assertThat(chat.initialMessageLine).isEqualTo(PresentableChannelSummary(image).initialMessageLine)
+        chat.attachments.all { a ->
+            PresentableChannelSummary(image).attachments.any { a2 ->
+                a2.pretext == a.pretext &&
+                        a2.fields.contentEquals(a.fields)
+            }
+        }
     }
 
     internal class FakeLambdaLogger : LambdaLogger {
