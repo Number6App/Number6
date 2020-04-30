@@ -6,8 +6,8 @@ import assertk.assertions.containsOnly
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import dev.number6.slackreader.SlackService
 import dev.number6.slackreader.generate.SlackReaderRDG
-import dev.number6.slackreader.model.Channel
-import dev.number6.slackreader.model.Message
+import dev.number6.slack.model.Channel
+import dev.number6.slack.model.Message
 import dev.number6.slackreader.port.SlackReaderPort
 import dev.number6.slackreader.port.SlackReaderConfigurationPort
 import io.mockk.every

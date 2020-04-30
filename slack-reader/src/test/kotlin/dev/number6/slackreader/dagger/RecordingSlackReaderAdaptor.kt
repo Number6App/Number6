@@ -3,8 +3,8 @@ package dev.number6.slackreader.dagger
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import dev.number6.slack.adaptor.SlackClientAdaptor
 import dev.number6.slackreader.adaptor.SlackReaderAdaptor
-import dev.number6.slackreader.model.Channel
-import dev.number6.slackreader.model.Message
+import dev.number6.slack.model.Channel
+import dev.number6.slack.model.Message
 import java.time.LocalDate
 
 class RecordingSlackReaderAdaptor(client: SlackClientAdaptor) : SlackReaderAdaptor(client) {

@@ -1,4 +1,4 @@
-package dev.number6.slackreader.model
+package dev.number6.slack.model
 
 import java.util.*
 

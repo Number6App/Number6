@@ -1,12 +1,6 @@
-package dev.number6.slackreader.model
+package dev.number6.slack.model
 
-class JoinChannelResponse(val ok: Boolean) {
-
-    override fun toString(): String {
-        return "JoinChannelResponse{" +
-                "ok=" + ok +
-                '}'
-    }
+data class JoinChannelResponse(val ok: Boolean) {
 
     companion object {
         fun failed(): JoinChannelResponse {

@@ -1,9 +1,9 @@
 package dev.number6.slackreader.generate
 
 import com.google.gson.Gson
-import dev.number6.slackreader.model.Channel
-import dev.number6.slackreader.model.ChannelHistoryResponse
-import dev.number6.slackreader.model.Message
+import dev.number6.slack.model.Channel
+import dev.number6.slack.model.ChannelHistoryResponse
+import dev.number6.slack.model.Message
 import dev.number6.slackreader.model.WorkspaceMessages
 import uk.org.fyodor.generators.Generator
 import uk.org.fyodor.generators.RDG

@@ -1,30 +1,26 @@
-package dev.number6.slackreader
+package dev.number6.slackreader.adaptor
 
 import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isNotNull
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import com.google.gson.Gson
-import dev.number6.slack.adaptor.SlackClientAdaptor
+import dev.number6.slack.model.ChannelHistoryResponse
+import dev.number6.slack.model.ChannelsListResponse
+import dev.number6.slack.model.JoinChannelResponse
+import dev.number6.slack.model.Message
 import dev.number6.slack.port.SlackPort
-import dev.number6.slackreader.adaptor.SlackReaderAdaptor
 import dev.number6.slackreader.generate.SlackReaderRDG
-import dev.number6.slackreader.model.*
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
-import io.mockk.verify
 import io.mockk.verifyOrder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import uk.org.fyodor.generators.RDG
 import java.time.LocalDate
-import java.time.ZoneOffset
-import java.util.*
 
 @ExtendWith(MockKExtension::class)
 internal class SlackReaderAdaptorTest {
-    private val gson = Gson()
 
     private val slackPort = mockk<SlackPort>()
 
@@ -33,11 +29,10 @@ internal class SlackReaderAdaptorTest {
 
     @Test
     fun getListOfSlackChannels() {
-        val channelsListResponse = SlackReaderRDG.channelsListResponse().next()
-        val expectedChannels = channelsListResponse.channels
-        prepareHttpGetCallMock(channelsListResponse)
+        val expectedChannels = SlackReaderRDG.channelsListResponse().next().channels
+        every { slackPort.getChannelList(logger) } returns ChannelsListResponse(true, expectedChannels)
+
         val channels = testee.getChannelList(logger)
-        verify(exactly = 1) { slackPort.getSlackResponse(SlackClientAdaptor.CHANNEL_LIST_URL, ChannelsListResponse::class.java, logger) }
 
         assertThat(channels).isNotNull()
                 .containsOnly(*expectedChannels.toTypedArray())
@@ -48,14 +43,14 @@ internal class SlackReaderAdaptorTest {
         val expectedChannelHistory = SlackReaderRDG.channelHistoryResponse().next()
         val channel = SlackReaderRDG.channel().next()
         val messagesDate = LocalDate.now()
-        val channelHistoryUrl = formatChannelHistoryUrl(channel, messagesDate)
-        val joinChannelUrl = formatJoinChannelUrl(channel)
-        prepareHttpGetCallMock(expectedChannelHistory)
-        prepareHttpPostCallMock(JoinChannelResponse.Companion.ok())
+
+        every { slackPort.joinChannel(channel, logger) } returns JoinChannelResponse.ok()
+        every { slackPort.getMessagesForChannelOnDate(channel, messagesDate, logger) } returns expectedChannelHistory
+
         val messages = testee.getMessagesForChannelOnDate(channel, messagesDate, logger)
         verifyOrder {
-            slackPort.callSlack(joinChannelUrl, "", JoinChannelResponse::class.java, logger)
-            slackPort.getSlackResponse(channelHistoryUrl, ChannelHistoryResponse::class.java, logger)
+            slackPort.joinChannel(channel, logger)
+            slackPort.getMessagesForChannelOnDate(channel, messagesDate, logger)
         }
         assertThat(messages).containsOnly(*expectedChannelHistory.messages.toTypedArray())
     }
@@ -80,11 +75,12 @@ internal class SlackReaderAdaptorTest {
                 expectedChannelHistory.latest)
         val channel = SlackReaderRDG.channel().next()
         val messagesDate = LocalDate.now()
-        val url = formatChannelHistoryUrl(channel, messagesDate)
-        prepareHttpGetCallMock(response)
-        prepareHttpPostCallMock(JoinChannelResponse.ok())
+
+        every { slackPort.joinChannel(channel, logger) } returns JoinChannelResponse.ok()
+        every { slackPort.getMessagesForChannelOnDate(channel, messagesDate, logger) } returns response
+
         val messages = testee.getMessagesForChannelOnDate(channel, messagesDate, logger)
-        verify { slackPort.getSlackResponse(url, ChannelHistoryResponse::class.java, logger) }
+
         assertThat(messages).containsOnly(*expectedChannelHistory.messages.toTypedArray())
     }
 
@@ -102,28 +98,12 @@ internal class SlackReaderAdaptorTest {
                 expectedChannelHistory.latest)
         val channel = SlackReaderRDG.channel().next()
         val messagesDate = LocalDate.now()
-        val url = formatChannelHistoryUrl(channel, messagesDate)
-        prepareHttpGetCallMock(response)
-        prepareHttpPostCallMock(JoinChannelResponse.ok())
+
+        every { slackPort.joinChannel(channel, logger) } returns JoinChannelResponse.ok()
+        every { slackPort.getMessagesForChannelOnDate(channel, messagesDate, logger) } returns response
+
         val messages = testee.getMessagesForChannelOnDate(channel, messagesDate, logger)
-        verify { slackPort.getSlackResponse(url, ChannelHistoryResponse::class.java, logger) }
+
         assertThat(messages).containsOnly(*expectedChannelHistory.messages.toTypedArray())
-    }
-
-    private fun formatChannelHistoryUrl(channel: Channel, messagesDate: LocalDate): String {
-        return String.format(SlackClientAdaptor.CHANNEL_HISTORY_URL, channel.id, messagesDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC),
-                messagesDate.plusDays(1).atStartOfDay().toEpochSecond(ZoneOffset.UTC))
-    }
-
-    private fun formatJoinChannelUrl(channel: Channel): String {
-        return String.format(SlackClientAdaptor.JOIN_CHANNEL_URL, channel.id)
-    }
-
-    private fun <T> prepareHttpGetCallMock(body: T) {
-        every { slackPort.getSlackResponse(any(), any<Class<T>>(), any()) } returns Optional.of(body)
-    }
-
-    private fun <T> prepareHttpPostCallMock(body: T) {
-        every { slackPort.callSlack(any(), any(), any<Class<T>>(), any()) } returns Optional.of(body)
     }
 }

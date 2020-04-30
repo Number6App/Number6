@@ -1,4 +1,4 @@
-package dev.number6.slackreader
+package dev.number6.slackreader.adaptor
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
@@ -6,8 +6,6 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import com.google.gson.Gson
 import dev.number6.message.ChannelMessages
-import dev.number6.slackreader.adaptor.EnvironmentVariableSlackReaderConfigurationAdapter
-import dev.number6.slackreader.adaptor.SnsNotificationAdaptor
 import dev.number6.slackreader.port.NotificationPort
 import dev.number6.slackreader.port.SlackReaderConfigurationPort
 import io.mockk.every
