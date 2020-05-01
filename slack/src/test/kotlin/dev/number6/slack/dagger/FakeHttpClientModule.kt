@@ -16,15 +16,6 @@ import javax.inject.Singleton
 @Module
 class FakeHttpClientModule {
 
-//    @Provides
-//    fun providesFakeSecretsPort(): SecretsPort {
-//        return object : SecretsPort {
-//            override fun getSlackTokenSecret(logger: LambdaLogger): String {
-//                return "SlackTokenSecret"
-//            }
-//        }
-//    }
-
     @Provides
     @Singleton
     fun providesFakeCallData(): FakeCallData {
@@ -36,6 +27,7 @@ class FakeHttpClientModule {
         return FakeCallFactory(fakeCallData)
     }
 
+    @Suppress("unused")
     internal enum class Datasource {
         ChannelList {
             override fun canHandle(request: Request): Boolean {
@@ -112,21 +104,6 @@ class FakeHttpClientModule {
 
         fun getFakeData(request: Request): String {
             return Datasource.getDatasourceForRequest(request).getData(this, request)
-        }
-
-        fun getChannelNames(): Iterable<String> {
-            return channelListResponse.channels.map { c -> c.name }
-        }
-
-        fun getNessagesForChannelName(channelName: String): Iterable<String?> {
-            return channelMessages.entries.stream()
-                    .filter { e -> e.key.name == channelName }
-                    .findFirst()
-                    .orElseThrow { RuntimeException("Unable to find history for channel name $channelName") }
-                    .value
-                    .messages
-                    .map { m -> m.text }
-
         }
 
         init {

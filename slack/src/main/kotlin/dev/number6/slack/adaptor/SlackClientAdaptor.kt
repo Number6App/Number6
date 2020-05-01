@@ -35,7 +35,7 @@ class SlackClientAdaptor @Inject internal constructor(private val client: HttpPo
 
     override fun getChannelList(logger: LambdaLogger): ChannelsListResponse {
         return getSlackResponse(CHANNEL_LIST_URL, ChannelsListResponse::class.java, logger)
-                .orElse(ChannelsListResponse(false, listOf()))
+                .orElse(ChannelsListResponse.failed())
     }
 
     override fun getMessagesForChannelOnDate(c: Channel, date: LocalDate, logger: LambdaLogger): ChannelHistoryResponse {
@@ -45,7 +45,7 @@ class SlackClientAdaptor @Inject internal constructor(private val client: HttpPo
                 date.plusDays(1).atStartOfDay().toEpochSecond(ZoneOffset.UTC)),
                 ChannelHistoryResponse::class.java,
                 logger)
-                .orElse(ChannelHistoryResponse(false, listOf(), false, date.toEpochDay(), date.toEpochDay()))
+                .orElse(ChannelHistoryResponse.failed())
     }
 
     override fun joinChannel(c: Channel, logger: LambdaLogger): JoinChannelResponse {

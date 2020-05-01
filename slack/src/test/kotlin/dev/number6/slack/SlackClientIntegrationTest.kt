@@ -10,7 +10,6 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-//@Disabled("not sure this is needed")
 class SlackClientIntegrationTest {
     private val logger: LambdaLogger = mockk(relaxUnitFun = true)
     private var testee = DaggerTestSlackClientComponent.create()

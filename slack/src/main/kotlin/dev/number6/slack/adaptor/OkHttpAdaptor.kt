@@ -39,17 +39,18 @@ internal class OkHttpAdaptor(private val client: Call.Factory,
 
     private fun buildPostRequestForUrl(url: String, body: String, logger: LambdaLogger): OkHttpRequestAdaptor {
         var builder = buildCommonRequest(url, logger)
-        if (!body.isEmpty()) {
+        if (body.isNotEmpty()) {
             builder = builder.post(RequestBody.create(MediaType.parse("application/json"), body))
         }
         return OkHttpRequestAdaptor(builder.build())
     }
 
     private fun buildCommonRequest(url: String, logger: LambdaLogger): Request.Builder {
-        return Request.Builder()
-                .addHeader(HttpHeaders.AUTHORIZATION, String.format(BEARER_TOKEN_VALUE, secretsPort.getSlackTokenSecret(logger)))
-                .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.toString())
-                .url(url)
+        return Request.Builder().apply {
+            addHeader(HttpHeaders.AUTHORIZATION, String.format(BEARER_TOKEN_VALUE, secretsPort.getSlackTokenSecret(logger)))
+            addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.toString())
+            url(url)
+        }
     }
 
     companion object {
