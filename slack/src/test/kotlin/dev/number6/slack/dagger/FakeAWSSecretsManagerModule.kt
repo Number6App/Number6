@@ -26,8 +26,6 @@ internal class FakeAWSSecretsManagerModule {
         return object : SlackConfigurationPort {
             override val slackTokenSecretName: String
                 get() = SLACK_TOKEN_SECRET_NAME
-            override val slackPostMessageUrl: String
-                get() = SLACK_POST_MESSAGE_URL
         }
     }
 
@@ -45,6 +43,5 @@ internal class FakeAWSSecretsManagerModule {
     companion object {
         private const val SLACK_TOKEN_SECRET_NAME = "SlackTokenSecretName"
         private const val SLACK_TOKEN_SECRET = "SlackTokenSecret"
-        private const val SLACK_POST_MESSAGE_URL = "http://post.me.to.slack.com"
     }
 }

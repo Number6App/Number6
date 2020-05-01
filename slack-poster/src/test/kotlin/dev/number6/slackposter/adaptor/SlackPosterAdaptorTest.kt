@@ -26,7 +26,6 @@ internal class SlackPosterAdaptorTest {
     @Test
     fun postsChatToSlackChannel() {
         every { slackPosterConfiguration.postingChannelId } returns "postingChannel"
-        every { slackPosterConfiguration.slackPostMessageUrl } returns "postingUrl"
         val summary = PresentableChannelSummary(ChannelSummaryImageBuilder.notFinalImage().build())
 
         testee.postMessageToChannel(summary, logger)

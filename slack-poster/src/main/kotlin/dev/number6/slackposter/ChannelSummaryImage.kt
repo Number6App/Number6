@@ -1,7 +1,6 @@
 package dev.number6.slackposter
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
-import java.util.stream.Collectors
 
 class ChannelSummaryImage(private val vals: Map<String, AttributeValue>) {
     fun hasFinalUpdate(): Boolean {
@@ -9,27 +8,21 @@ class ChannelSummaryImage(private val vals: Map<String, AttributeValue>) {
     }
 
     val sentimentScoreTotals: Map<String, Double> by lazy {
-            valNamed(SENTIMENT_SCORE_TOTALS).m
-                    .mapKeys { e -> e.key }
-                    .mapValues { e -> e.value.n.toDouble() }
-//            return sentimentScoreTotals.entries.stream()
-//                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toDouble() }))
-        }
+        valNamed(SENTIMENT_SCORE_TOTALS).m
+                .mapKeys { e -> e.key }
+                .mapValues { e -> e.value.n.toDouble() }
+    }
 
     val sentimentTotals: Map<String, Int> by lazy {
-            valNamed(SENTIMENT_TOTALS_KEY).m
-                    .mapKeys { e -> e.key }
-                    .mapValues { e -> e.value.n.toInt() }
-//            return sentimentTotals.entries.stream()
-//                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toInt() }))
-        }
+        valNamed(SENTIMENT_TOTALS_KEY).m
+                .mapKeys { e -> e.key }
+                .mapValues { e -> e.value.n.toInt() }
+    }
 
     val keyPhrasesTotals: Map<String, Int> by lazy {
         valNamed(KEYPHRASES_TOTALS_KEY).m
                 .mapKeys { e -> e.key }
                 .mapValues { e -> e.value.n.toInt() }
-//            return keyPhrasesTotals.entries.stream()
-//                    .collect(Collectors.toMap({ e -> e.key }, { e -> e.value.n.toInt() }))
     }
 
     val channelName: String by lazy { valNamed(CHANNEL_NAME_KEY).s }
@@ -41,13 +34,6 @@ class ChannelSummaryImage(private val vals: Map<String, AttributeValue>) {
 
         entityTotals.mapKeys { e -> e.key }
                 .mapValues { e -> e.value.m.mapKeys { e1 -> e1.key }.mapValues { e1 -> e1.value.n.toInt() } }
-//        entityTotals.entries.stream()
-//                .collect(Collectors.toMap({ e -> e.key },
-//                        { e ->
-//                            e.value.m.entries.stream()
-//                                    .collect(Collectors.toMap({ e1 -> e1.key },
-//                                            { e2 -> e2.value.n.toInt() }))
-//                        }))
     }
 
     private fun valNamed(key: String): AttributeValue {
@@ -70,5 +56,4 @@ class ChannelSummaryImage(private val vals: Map<String, AttributeValue>) {
         const val KEYPHRASES_TOTALS_KEY = "keyPhrasesTotals"
         const val SENTIMENT_SCORE_TOTALS = "sentimentScoreTotals"
     }
-
 }

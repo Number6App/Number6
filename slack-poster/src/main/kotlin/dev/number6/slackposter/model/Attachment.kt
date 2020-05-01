@@ -19,10 +19,4 @@ open class Attachment(var fallback: String,// = "#2eb886";
                       var thumbUrl: String? = null,// = "Slack API";
                       var footer: String? = null,// = "https://platform.slack-edge.com/img/default_application_icon.png";
                       var footerIcon: String? = null,// = 123456789L;
-                      var ts: Long? = null) {
-
-    protected fun asTitleCase(input: String): String {
-        return Character.toTitleCase(input[0]).toString() + input.toLowerCase().substring(1)
-
-    }
-}
+                      var ts: Long? = null)

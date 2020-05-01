@@ -6,7 +6,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent
 import dev.number6.slackposter.dagger.DaggerSlackPosterComponent
 
-fun DynamodbEvent.DynamodbStreamRecord.isModifyEvent(): Boolean{
+fun DynamodbEvent.DynamodbStreamRecord.isModifyEvent(): Boolean {
     return OperationType.fromValue(this.eventName) == OperationType.MODIFY
 }
 
