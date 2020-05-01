@@ -15,15 +15,15 @@ import javax.inject.Inject
 
 class SlackClientAdaptor @Inject internal constructor(private val client: HttpPort) : SlackPort {
     private val gson = Gson()
-    override fun postToSlackNoResponse(url: String, logger: LambdaLogger, body: String): Optional<String> {
+    private fun postToSlackNoResponse(url: String, logger: LambdaLogger, body: String): Optional<String> {
         return callSlack(url, body, null, logger)
     }
 
-    override fun <T> getSlackResponse(url: String, responseType: Class<T>?, logger: LambdaLogger): Optional<T> {
+    private fun <T> getSlackResponse(url: String, responseType: Class<T>?, logger: LambdaLogger): Optional<T> {
         return callSlack(url, null, responseType, logger)
     }
 
-    override fun <T> callSlack(url: String, body: String?, responseType: Class<T>?, logger: LambdaLogger): Optional<T> {
+    private fun <T> callSlack(url: String, body: String?, responseType: Class<T>?, logger: LambdaLogger): Optional<T> {
         val response = if (body == null) client.get(url, logger) else client.post(url, body, logger)
         logger.log("Response from Slack request: ${response.body()}")
         return if (responseType == null || !response.isSuccess) Optional.empty() else Optional.of(gson.fromJson(response.body(), responseType))
@@ -39,8 +39,7 @@ class SlackClientAdaptor @Inject internal constructor(private val client: HttpPo
     }
 
     override fun getMessagesForChannelOnDate(c: Channel, date: LocalDate, logger: LambdaLogger): ChannelHistoryResponse {
-//        TODO("Not yet implemented")
-        return getSlackResponse(String.format(CHANNEL_HISTORY_URL,
+        return getSlackResponse(CHANNEL_HISTORY_URL.format(
                 c.id,
                 date.atStartOfDay().toEpochSecond(ZoneOffset.UTC),
                 date.plusDays(1).atStartOfDay().toEpochSecond(ZoneOffset.UTC)),

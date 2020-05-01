@@ -44,7 +44,7 @@ internal class SlackReaderIntegrationTest {
 
     private fun testEventComprehensionDate(event: Map<String, Any>?, comprehensionDate: LocalDate?) {
         var triggerEvent = event
-        val reader = testee.getSlackPort() as RecordingSlackReaderAdaptor
+        val reader = testee.getSlackReaderPort() as RecordingSlackReaderAdaptor
         val fakeDynamo = testee.getFakeAmazonDynamoClient()
         val fakeSns = testee.getFakeAmazonSns()
         triggerEvent = triggerEvent?.plus(SlackReader.COMPREHENSION_DATE_FIELD_NAME to comprehensionDate.toString())

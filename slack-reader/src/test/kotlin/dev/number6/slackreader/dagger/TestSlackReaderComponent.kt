@@ -24,5 +24,5 @@ interface TestSlackReaderComponent : SlackReaderComponent {
     fun getFakeAmazonDynamoClient(): FakeDynamoDbMapperModule.FakeAmazonDynamoDB
     fun getFakeAmazonSns(): FakeAmazonSns
     fun getClock(): Clock
-    fun getSlackPort(): SlackReaderPort
+    fun getSlackReaderPort(): SlackReaderPort
 }

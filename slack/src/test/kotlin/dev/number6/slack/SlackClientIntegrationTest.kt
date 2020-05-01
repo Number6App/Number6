@@ -1,40 +1,43 @@
 package dev.number6.slack
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import dev.number6.slack.adaptor.SlackClientAdaptor
 import dev.number6.slack.dagger.DaggerTestSlackClientComponent
-import dev.number6.slack.dagger.FakeHttpClientModule
-import dev.number6.slack.dagger.FakeHttpClientModule_ProvidesFakeCallFactoryFactory
+import dev.number6.slack.generate.SlackRDG
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
+//@Disabled("not sure this is needed")
 class SlackClientIntegrationTest {
+    private val logger: LambdaLogger = mockk(relaxUnitFun = true)
     private var testee = DaggerTestSlackClientComponent.create()
 
     @Test
-    fun get() {
-        val client = testee.slackPort()
-        val response = client.getSlackResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, String::class.java, FakeLogger())
-        assertThat(response.isPresent).isTrue()
-        assertThat(response.get()).isEqualTo(FakeHttpClientModule.FakeCallFactory.FAKE_CALL_RESPONSE_BODY)
+    fun joinChannel() {
+        val c = SlackRDG.channel().next()
+        val joinChannelResponse = testee.slackPort().joinChannel(c, logger)
+        assertThat(joinChannelResponse.ok).isTrue()
     }
 
     @Test
-    fun post() {
-        val client = testee.slackPort()
-        val response = client.postToSlackNoResponse(SlackClientAdaptor.CHANNEL_HISTORY_URL, FakeLogger(), "body")
-        assertThat(response.isPresent).isFalse()
+    fun getChannelListAndMessages() {
+        val channelsListResponse = testee.slackPort().getChannelList(logger)
+        println(channelsListResponse.channels)
+        assertThat(channelsListResponse.ok).isTrue()
+        assertThat(channelsListResponse.channels).isNotEmpty()
+        channelsListResponse.channels.forEach { c ->
+            val channelHistoryResponse = testee.slackPort().getMessagesForChannelOnDate(c, LocalDate.now(), logger)
+            assertThat(channelHistoryResponse.ok).isTrue()
+            assertThat(channelHistoryResponse.messages).isNotEmpty()
+        }
     }
 
     @Test
-    fun postWithResponse() {
-        val client = testee.slackPort()
-        val response = client.callSlack(SlackClientAdaptor.CHANNEL_HISTORY_URL, "body", String::class.java, FakeLogger())
-        assertThat(response.isPresent).isTrue()
-        assertThat(response.get()).isEqualTo(FakeHttpClientModule.FakeCallFactory.FAKE_CALL_RESPONSE_BODY)
+    fun postMessage() {
+        testee.slackPort().postMessageToChannel("Message Content", logger)
     }
 
     private class FakeLogger : LambdaLogger {
