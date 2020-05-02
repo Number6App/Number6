@@ -18,11 +18,11 @@
             <artifactId>aws-java-sdk-comprehend</artifactId>
             <version>${aws-java-sdk-bom.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-dynamodb</artifactId>
-            <version>${aws-java-sdk-bom.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.amazonaws</groupId>-->
+<!--            <artifactId>aws-java-sdk-dynamodb</artifactId>-->
+<!--            <version>${aws-java-sdk-bom.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
@@ -30,6 +30,14 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-events</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
         </dependency>
     </dependencies>
 </project>

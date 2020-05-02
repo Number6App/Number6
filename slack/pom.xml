@@ -25,6 +25,14 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
     </dependencies>
 
 
