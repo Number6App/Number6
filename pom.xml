@@ -110,7 +110,6 @@
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
-                <!--include stdlib here just so intellij uses correct version-->
                 <artifactId>kotlin-stdlib</artifactId>
                 <version>${kotlin.version}</version>
                 <scope>provided</scope>
@@ -155,11 +154,6 @@
     </dependencyManagement>
 
     <dependencies>
-
-<!--        <dependency>-->
-<!--            <groupId>com.google.dagger</groupId>-->
-<!--            <artifactId>dagger-compiler</artifactId>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
