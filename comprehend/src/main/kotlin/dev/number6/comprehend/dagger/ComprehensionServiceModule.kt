@@ -7,7 +7,6 @@ import dagger.Provides
 import dev.number6.comprehend.AwsComprehendClient
 import dev.number6.comprehend.adaptor.AwsComprehensionAdaptor
 import dev.number6.comprehend.port.ComprehensionPort
-import javax.inject.Singleton
 
 @Module
 class ComprehensionServiceModule {

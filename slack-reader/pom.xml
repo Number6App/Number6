@@ -22,6 +22,10 @@
             <artifactId>slack</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sns</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

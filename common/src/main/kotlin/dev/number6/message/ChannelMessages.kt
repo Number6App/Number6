@@ -17,7 +17,7 @@ class ChannelMessages {
     lateinit var messages: Collection<String?>
         private set
 
-    constructor() {}
+    constructor()
     constructor(channelName: String, messages: Collection<String?>, comprehensionDate: LocalDate) {
         this.channelName = channelName
         this.messages = messages
