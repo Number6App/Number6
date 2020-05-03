@@ -8,15 +8,11 @@ import dev.number6.comprehend.results.PresentableKeyPhrasesResults
 import dev.number6.comprehend.results.PresentableSentimentResults
 import dev.number6.db.model.ChannelComprehensionSummary
 import dev.number6.db.port.DatabaseConfigurationPort
-import dev.number6.db.port.DatabasePort
-import java.time.LocalDate
+import dev.number6.db.port.FullDatabasePort
 import java.util.function.BiConsumer
-import java.util.function.Consumer
 
-class DynamoDatabaseAdaptor(private val mapper: DynamoDBMapper, private val dbConfig: DatabaseConfigurationPort) : DatabasePort {
-    override fun createNewSummaryForChannels(channelNames: Collection<String>, comprehensionDate: LocalDate) {
-        channelNames.forEach(Consumer { c: String -> createNewSummaryForChannel(c, comprehensionDate) })
-    }
+class DynamoFullDatabaseAdaptor(private val mapper: DynamoDBMapper, private val dbConfig: DatabaseConfigurationPort) :
+        DynamoBasicDatabaseAdaptor(mapper, dbConfig), FullDatabasePort {
 
     override fun save(results: PresentableSentimentResults) {
         save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableSentimentResults ->
@@ -46,9 +42,4 @@ class DynamoDatabaseAdaptor(private val mapper: DynamoDBMapper, private val dbCo
             save(results, summaryUpdater)
         }
     }
-
-    private fun createNewSummaryForChannel(channelName: String, comprehensionDate: LocalDate) {
-        mapper.save(ChannelComprehensionSummary(channelName, comprehensionDate), dbConfig.dynamoDBMapperConfig)
-    }
-
 }

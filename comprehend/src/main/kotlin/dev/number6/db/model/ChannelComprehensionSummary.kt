@@ -21,15 +21,18 @@ class ChannelComprehensionSummary {
     @DynamoDBHashKey
     lateinit var channelName: String
 
+    //    @DynamoDBTypeConverted(converter = SentimentScoreConverter.class)
     @DynamoDBAttribute
     var sentimentScoreTotals: Map<String, Float> = HashMap()
 
+    //    @DynamoDBTypeConverted(converter = SentimentTotalConverter.class)
     @DynamoDBAttribute
     var sentimentTotals: Map<String, Int> = HashMap()
 
     @DynamoDBAttribute
     var keyPhrasesTotals: Map<String, Long> = HashMap()
 
+    //    @DynamoDBTypeConverted(converter = EntityTotalConverter.class)
     @DynamoDBAttribute
     var entityTotals: Map<String, Map<String, Long>> = HashMap()
 

@@ -3,7 +3,6 @@ package dev.number6.comprehend.adaptor
 import com.amazonaws.services.comprehend.model.DetectEntitiesResult
 import com.amazonaws.services.comprehend.model.DetectKeyPhrasesResult
 import com.amazonaws.services.comprehend.model.DetectSentimentResult
-import com.amazonaws.services.comprehend.model.KeyPhrase
 import dev.number6.comprehend.AwsComprehendClient
 import dev.number6.comprehend.port.ComprehensionPort
 import dev.number6.comprehend.results.PresentableEntityResults
@@ -11,8 +10,6 @@ import dev.number6.comprehend.results.PresentableKeyPhrasesResults
 import dev.number6.comprehend.results.PresentableSentimentResults
 import dev.number6.message.ChannelMessages
 import java.util.*
-import java.util.function.Function
-import java.util.stream.Collectors
 
 class AwsComprehensionAdaptor(private val awsComprehendClient: AwsComprehendClient) : ComprehensionPort {
     override fun getEntitiesForSlackMessages(channelMessages: ChannelMessages): PresentableEntityResults {

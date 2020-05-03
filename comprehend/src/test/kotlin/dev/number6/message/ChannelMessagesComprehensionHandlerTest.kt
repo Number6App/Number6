@@ -1,7 +1,7 @@
 package dev.number6.message
 
 import dev.number6.comprehend.results.PresentableEntityResults
-import dev.number6.generate.CommonRDG
+import dev.number6.generate.ComprehendRDG
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -17,8 +17,8 @@ internal class ChannelMessagesComprehensionHandlerTest {
 
     @Test
     fun convertMessagesAndAppliesConsumer() {
-        val channelMessages = CommonRDG.channelMessages().next()
-        val results = CommonRDG.presentableEntityResults().next()
+        val channelMessages = ComprehendRDG.channelMessages().next()
+        val results = ComprehendRDG.presentableEntityResults().next()
         every { resultsFunction.apply(channelMessages.hint(PresentableEntityResults::class, 1)) } returns results
         val testee = ChannelMessagesComprehensionHandler(resultsFunction, resultsConsumer)
         testee.handle(channelMessages)

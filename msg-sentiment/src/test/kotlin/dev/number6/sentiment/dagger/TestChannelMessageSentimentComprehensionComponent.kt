@@ -6,7 +6,7 @@ import dev.number6.message.ChannelMessagesToComprehensionResultsFunction
 import dev.number6.message.ComprehensionResultsConsumer
 import javax.inject.Singleton
 
-@Component(modules = [FakeCommonModule::class, ChannelMessagesHandlerModule::class, FakeComprehensionResultsModule::class])
+@Component(modules = [FakeComprehendModule::class, ChannelMessagesHandlerModule::class, FakeComprehensionResultsModule::class])
 @Singleton
 interface TestChannelMessageSentimentComprehensionComponent : ChannelMessagesSentimentComprehensionComponent {
     @Singleton

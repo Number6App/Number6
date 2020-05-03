@@ -1,7 +1,7 @@
 package dev.number6.slackreader.core
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger
-import dev.number6.db.adaptor.DynamoDatabaseAdaptor
+import dev.number6.db.adaptor.DynamoBasicDatabaseAdaptor
 import dev.number6.slackreader.SlackReader
 import dev.number6.slackreader.SlackService
 import dev.number6.slackreader.SnsService
@@ -26,7 +26,7 @@ class SlackReaderTest {
     private val logger = mockk<LambdaLogger>()
     private val slackService = mockk<SlackService>()
     private val snsService = mockk<SnsService>(relaxUnitFun = true)
-    private val dbService = mockk<DynamoDatabaseAdaptor>(relaxUnitFun = true)
+    private val dbService = mockk<DynamoBasicDatabaseAdaptor>(relaxUnitFun = true)
     private val clock = Clock.fixed(Instant.now().minus(RDG.longVal(10L).next(), ChronoUnit.DAYS), ZoneId.systemDefault())
     private var testee: SlackReader? = null
 

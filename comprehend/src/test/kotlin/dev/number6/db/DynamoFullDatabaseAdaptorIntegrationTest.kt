@@ -5,22 +5,23 @@ import assertk.assertions.containsOnly
 import assertk.assertions.extracting
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
-import dev.number6.db.TestDynamoDatabaseAdaptorComponent.FakeDynamoDBMapper
+import dev.number6.db.dagger.DaggerTestDynamoFullDatabaseAdaptorComponent
+import dev.number6.db.dagger.TestDynamoFullDatabaseAdaptorComponent
 import dev.number6.db.model.ChannelComprehensionSummary
-import dev.number6.db.port.DatabasePort
-import dev.number6.generate.CommonRDG
+import dev.number6.db.port.FullDatabasePort
+import dev.number6.generate.ComprehendRDG
 import org.junit.jupiter.api.Test
 import uk.org.fyodor.generators.RDG
 import java.time.LocalDate
 import java.util.function.Consumer
 
-class DynamoDatabaseAdaptorIntegrationTest {
-    private val component = DaggerTestDynamoDatabaseAdaptorComponent.create()
+class DynamoFullDatabaseAdaptorIntegrationTest {
+    private val component = DaggerTestDynamoFullDatabaseAdaptorComponent.create()
 
     @Test
     fun createChannels() {
         val channelNames: Collection<String> = RDG.list(RDG.string()).next()
-        val mapper = component.fakeDynamoDBMapper as FakeDynamoDBMapper
+        val mapper = component.fakeDynamoDBMapper as TestDynamoFullDatabaseAdaptorComponent.FakeDynamoDBMapper
         component.database.createNewSummaryForChannels(channelNames, LocalDate.now())
         assertThat(mapper.saved).hasSize(channelNames.size)
         assertThat(mapper.saved)
@@ -30,14 +31,14 @@ class DynamoDatabaseAdaptorIntegrationTest {
 
     @Test
     fun saveEntityResults() {
-        val results = CommonRDG.presentableEntityResults().next()
+        val results = ComprehendRDG.presentableEntityResults().next()
         val summary = saveResults(Consumer { m -> m.save(results) })
         assertThat(summary.entityTotals).isEqualTo(results.results)
     }
 
     @Test
     fun saveSentimentResults() {
-        val results = CommonRDG.presentableSentimentResults().next()
+        val results = ComprehendRDG.presentableSentimentResults().next()
         val summary = saveResults(Consumer { m -> m.save(results) })
         assertThat(summary.sentimentTotals).isEqualTo(results.sentimentTotals)
         assertThat(summary.sentimentScoreTotals).isEqualTo(results.sentimentScoreTotals)
@@ -45,13 +46,13 @@ class DynamoDatabaseAdaptorIntegrationTest {
 
     @Test
     fun saveKeyPhrasesResults() {
-        val results = CommonRDG.presentableKeyPhrasesResults().next()
+        val results = ComprehendRDG.presentableKeyPhrasesResults().next()
         val summary = saveResults(Consumer { m -> m.save(results) })
         assertThat(summary.keyPhrasesTotals).isEqualTo(results.results)
     }
 
-    private fun saveResults(resultsConsumer: Consumer<DatabasePort>): ChannelComprehensionSummary {
-        val mapper = component.fakeDynamoDBMapper as FakeDynamoDBMapper
+    private fun saveResults(resultsConsumer: Consumer<FullDatabasePort>): ChannelComprehensionSummary {
+        val mapper = component.fakeDynamoDBMapper as TestDynamoFullDatabaseAdaptorComponent.FakeDynamoDBMapper
         resultsConsumer.accept(component.database)
         assertThat(mapper.saved).hasSize(1)
         return mapper.saved[0]

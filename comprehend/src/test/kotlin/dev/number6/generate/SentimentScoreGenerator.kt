@@ -6,9 +6,9 @@ import uk.org.fyodor.generators.Generator
 class SentimentScoreGenerator : Generator<SentimentScore> {
     override fun next(): SentimentScore {
         return SentimentScore()
-                .withMixed(CommonRDG.sentimentScoreFloat())
-                .withNegative(CommonRDG.sentimentScoreFloat())
-                .withPositive(CommonRDG.sentimentScoreFloat())
-                .withNeutral(CommonRDG.sentimentScoreFloat())
+                .withMixed(ComprehendRDG.sentimentScoreFloat())
+                .withNegative(ComprehendRDG.sentimentScoreFloat())
+                .withPositive(ComprehendRDG.sentimentScoreFloat())
+                .withNeutral(ComprehendRDG.sentimentScoreFloat())
     }
 }

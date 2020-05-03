@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dev.number6.comprehend.port.ComprehensionPort
 import dev.number6.comprehend.results.PresentableEntityResults
-import dev.number6.db.port.DatabasePort
+import dev.number6.db.port.FullDatabasePort
 import dev.number6.message.ChannelMessages
 import dev.number6.message.ChannelMessagesToComprehensionResultsFunction
 import dev.number6.message.ComprehensionResultsConsumer
@@ -21,7 +21,7 @@ class ComprehensionResultsModule {
     }
 
     @Provides
-    fun providesEntityResultsConsumer(databasePort: DatabasePort): ComprehensionResultsConsumer<PresentableEntityResults> {
+    fun providesEntityResultsConsumer(databasePort: FullDatabasePort): ComprehensionResultsConsumer<PresentableEntityResults> {
         return object : ComprehensionResultsConsumer<PresentableEntityResults> {
             override fun accept(results: PresentableEntityResults) {
                 return databasePort.save(results)

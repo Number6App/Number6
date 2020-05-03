@@ -15,6 +15,7 @@
         <module>slack-poster</module>
         <module>slack-reader</module>
         <module>slack</module>
+        <module>comprehend</module>
     </modules>
     <packaging>pom</packaging>
 

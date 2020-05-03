@@ -10,7 +10,7 @@ import dev.number6.comprehend.results.PresentableSentimentResults
 import dev.number6.comprehend.results.SentimentResultsToMessageSentimentScore
 import dev.number6.comprehend.results.SentimentResultsToMessageSentimentTotals
 import dev.number6.db.adaptor.DatabaseServiceConfigurationAdaptor
-import dev.number6.db.adaptor.DynamoDatabaseAdaptor
+import dev.number6.db.adaptor.DynamoFullDatabaseAdaptor
 import dev.number6.db.model.ChannelComprehensionSummary
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
@@ -27,11 +27,11 @@ import java.util.*
 
 
 @ExtendWith(MockKExtension::class)
-internal class DynamoDatabaseAdaptorTest {
+internal class DynamoFullDatabaseAdaptorTest {
     private val mapper = mockk<DynamoDBMapper>(relaxUnitFun = true)
     private val dynamoDBMapperConfig = mockk<DynamoDBMapperConfig>()
     private val dbConfig = mockk<DatabaseServiceConfigurationAdaptor>()
-    private val testee = DynamoDatabaseAdaptor(mapper, dbConfig)
+    private val testee = DynamoFullDatabaseAdaptor(mapper, dbConfig)
 
     @BeforeEach
     fun setup() {

@@ -1,4 +1,4 @@
-package dev.number6.db
+package dev.number6.db.dagger
 
 import com.amazonaws.AmazonWebServiceRequest
 import com.amazonaws.ResponseMetadata
@@ -11,19 +11,17 @@ import com.amazonaws.services.dynamodbv2.waiters.AmazonDynamoDBWaiters
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import dev.number6.db.TestDynamoDatabaseAdaptorComponent.FakeDynamoDBMapperModule
-import dev.number6.db.dagger.DatabasePortModule
 import dev.number6.db.model.ChannelComprehensionSummary
-import dev.number6.db.port.DatabasePort
-import dev.number6.generate.CommonRDG
+import dev.number6.db.port.FullDatabasePort
+import dev.number6.generate.ComprehendRDG
 import org.junit.jupiter.api.Assertions
 import java.util.*
 import javax.inject.Singleton
 
-@Component(modules = [DatabasePortModule::class, FakeDynamoDBMapperModule::class])
+@Component(modules = [FullDatabasePortModule::class, TestDynamoFullDatabaseAdaptorComponent.FakeDynamoDBMapperModule::class])
 @Singleton
-interface TestDynamoDatabaseAdaptorComponent {
-    val database: DatabasePort
+interface TestDynamoFullDatabaseAdaptorComponent {
+    val database: FullDatabasePort
     val fakeDynamoDBMapper: DynamoDBMapper
 
     @Module
@@ -38,7 +36,7 @@ interface TestDynamoDatabaseAdaptorComponent {
     class FakeDynamoDBMapper(dynamoDB: AmazonDynamoDB) : DynamoDBMapper(dynamoDB) {
         val saved: MutableList<ChannelComprehensionSummary> = ArrayList()
         override fun <T> load(clazz: Class<T>, hashKey: Any, rangeKey: Any, config: DynamoDBMapperConfig): T {
-            return clazz.cast(CommonRDG.channelComprehensionSummary().next())
+            return clazz.cast(ComprehendRDG.channelComprehensionSummary().next())
         }
 
         override fun <T> save(`object`: T, config: DynamoDBMapperConfig) {
