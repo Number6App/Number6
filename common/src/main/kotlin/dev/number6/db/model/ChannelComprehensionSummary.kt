@@ -36,7 +36,7 @@ class ChannelComprehensionSummary {
     @DynamoDBVersionAttribute
     var version: Int? = null
 
-    constructor() {}
+    constructor()
     constructor(channelName: String, comprehensionDate: LocalDate) {
         this.channelName = channelName
         this.comprehensionDate = comprehensionDate

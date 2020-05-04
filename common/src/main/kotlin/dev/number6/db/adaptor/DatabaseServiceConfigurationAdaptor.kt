@@ -5,13 +5,11 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.Table
 import dev.number6.db.port.DatabaseConfigurationPort
 
 class DatabaseServiceConfigurationAdaptor : DatabaseConfigurationPort {
-    override val dynamoDBMapperConfig: DynamoDBMapperConfig
+    override val dynamoDBMapperConfig: DynamoDBMapperConfig by lazy {
+        TableNameOverride(System.getenv(DB_TABLE)).config()
+    }
 
     companion object {
         const val DB_TABLE = "DB_TABLE"
-    }
-
-    init {
-        dynamoDBMapperConfig = TableNameOverride(System.getenv(DB_TABLE)).config()
     }
 }
