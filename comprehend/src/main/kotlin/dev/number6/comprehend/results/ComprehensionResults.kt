@@ -1,14 +1,30 @@
 package dev.number6.comprehend.results
 
+import com.amazonaws.AmazonWebServiceResult
+import com.amazonaws.services.comprehend.model.DetectEntitiesResult
+import com.amazonaws.services.comprehend.model.DetectKeyPhrasesResult
 import com.amazonaws.services.comprehend.model.DetectSentimentResult
 import java.time.LocalDate
 
-sealed class ComprehensionResults<T>(val comprehensionDate: LocalDate, val results: T, val channelName: String)
+sealed class ComprehensionResults<T : AmazonWebServiceResult<*>, U>(val comprehensionDate: LocalDate, val results: Collection<T>, val channelName: String) {
+
+    abstract val presentableResults: U
+}
+
 
 class PresentableEntityResults(comprehensionDate: LocalDate,
-                               entitiesResults: Map<String, Map<String, Long>>,
+                               entitiesResults: Collection<DetectEntitiesResult>,
                                channelName: String) :
-        ComprehensionResults<Map<String, Map<String, Long>>>(comprehensionDate, entitiesResults, channelName) {
+        ComprehensionResults<DetectEntitiesResult, Map<String, Map<String, Long>>>(comprehensionDate, entitiesResults, channelName) {
+
+    override val presentableResults: Map<String, Map<String, Long>> by lazy {
+        results.filter { e: DetectEntitiesResult -> !e.entities.isNullOrEmpty() }
+                .flatMap { e: DetectEntitiesResult -> e.entities }
+                .groupBy { e -> e.type }
+                .mapValues { e -> e.value.groupBy { e1 -> e1.text } }
+                .mapValues { e -> e.value.mapValues { e2 -> e2.value.size.toLong() } }
+    }
+
     override fun toString(): String {
         return "EntityResults{" +
                 "comprehensionDate=" + comprehensionDate +
@@ -19,15 +35,23 @@ class PresentableEntityResults(comprehensionDate: LocalDate,
 }
 
 class PresentableKeyPhrasesResults(comprehensionDate: LocalDate,
-                                   keyPhrasesResults: Map<String, Long>,
+                                   keyPhrasesResults: Collection<DetectKeyPhrasesResult>,
                                    channelName: String) :
-        ComprehensionResults<Map<String, Long>>(comprehensionDate, keyPhrasesResults, channelName) {
+        ComprehensionResults<DetectKeyPhrasesResult, Map<String, Long>>(comprehensionDate, keyPhrasesResults, channelName) {
     override fun toString(): String {
         return "KeyPhrasesResults{" +
                 "comprehensionDate=" + comprehensionDate +
                 ", keyPhrasesResults=" + results +
                 ", channelName='" + channelName + '\'' +
                 '}'
+    }
+
+    override val presentableResults: Map<String, Long> by lazy {
+        results
+                .filter { r: DetectKeyPhrasesResult -> !r.keyPhrases.isNullOrEmpty() }
+                .flatMap { r: DetectKeyPhrasesResult -> r.keyPhrases }
+                .groupBy { keyPhrase -> keyPhrase.text }
+                .mapValues { e -> e.value.size.toLong() }
     }
 }
 
@@ -38,12 +62,16 @@ class PresentableSentimentResults @JvmOverloads constructor(comprehensionDate: L
                                                                     SentimentResultsToMessageSentimentScore(),
                                                             private val sentimentResultsToMessageSentimentTotals: SentimentResultsToMessageSentimentTotals =
                                                                     SentimentResultsToMessageSentimentTotals()) :
-        ComprehensionResults<Collection<DetectSentimentResult>>(comprehensionDate, sentimentResults, channelName) {
+        ComprehensionResults<DetectSentimentResult, Collection<DetectSentimentResult>>(comprehensionDate, sentimentResults, channelName) {
     val sentimentTotals: Map<String, Int>
         get() = sentimentResultsToMessageSentimentTotals.apply(results)
 
     val sentimentScoreTotals: Map<String, Float>
         get() = sentimentResultsToMessageSentimentScore.apply(results)
+
+    override val presentableResults: Collection<DetectSentimentResult> by lazy {
+        results
+    }
 
     override fun toString(): String {
         return "SentimentResults{" +
@@ -52,5 +80,4 @@ class PresentableSentimentResults @JvmOverloads constructor(comprehensionDate: L
                 ", channelName='" + channelName + '\'' +
                 '}'
     }
-
 }

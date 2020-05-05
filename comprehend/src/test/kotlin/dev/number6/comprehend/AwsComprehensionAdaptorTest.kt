@@ -68,12 +68,6 @@ internal class AwsComprehensionAdaptorTest {
                         KeyPhrase().withText(KEY_PHRASE_TEXT_2),
                         KeyPhrase().withText(KEY_PHRASE_TEXT_1))
         )
-//        (messageKeyPhrasesResults as HashMap<String, DetectKeyPhrasesResult>)[MESSAGE_1_TEXT] = DetectKeyPhrasesResult().withKeyPhrases(KeyPhrase().withText(KEY_PHRASE_TEXT_1))
-//        (messageKeyPhrasesResults as HashMap<String, DetectKeyPhrasesResult>)[MESSAGE_2_TEXT] = DetectKeyPhrasesResult().withKeyPhrases(KeyPhrase().withText(KEY_PHRASE_TEXT_2),
-//                KeyPhrase().withText(KEY_PHRASE_TEXT_1))
-//        (messageKeyPhrasesResults as HashMap<String, DetectKeyPhrasesResult>)[MESSAGE_3_TEXT] = DetectKeyPhrasesResult().withKeyPhrases(KeyPhrase().withText(KEY_PHRASE_TEXT_3),
-//                KeyPhrase().withText(KEY_PHRASE_TEXT_2),
-//                KeyPhrase().withText(KEY_PHRASE_TEXT_1))
     }
 
     @BeforeEach
@@ -86,15 +80,6 @@ internal class AwsComprehensionAdaptorTest {
                         Entity().withText(EVENT_ENTITY_2).withType(EntityType.EVENT),
                         Entity().withText(ORGANIZATION_ENTITY).withType(EntityType.ORGANIZATION)
                 ))
-
-//        (messageEntityResults as HashMap<String, DetectEntitiesResult>)[MESSAGE_1_TEXT] = DetectEntitiesResult().withEntities(Entity().withText(COMMERCIAL_ITEM_ENTITY).withType(EntityType.COMMERCIAL_ITEM))
-//        (messageEntityResults as HashMap<String, DetectEntitiesResult>)[MESSAGE_2_TEXT] = DetectEntitiesResult().withEntities(Entity().withText(COMMERCIAL_ITEM_ENTITY).withType(EntityType.COMMERCIAL_ITEM),
-//                Entity().withText(EVENT_ENTITY_1).withType(EntityType.EVENT))
-//        (messageEntityResults as HashMap<String, DetectEntitiesResult>)[MESSAGE_3_TEXT] = DetectEntitiesResult().withEntities(Entity().withText(COMMERCIAL_ITEM_ENTITY).withType(EntityType.COMMERCIAL_ITEM),
-//                Entity().withText(EVENT_ENTITY_1).withType(EntityType.EVENT),
-//                Entity().withText(EVENT_ENTITY_2).withType(EntityType.EVENT),
-//                Entity().withText(ORGANIZATION_ENTITY).withType(EntityType.ORGANIZATION)
-//        )
     }
 
     @BeforeEach
@@ -117,24 +102,6 @@ internal class AwsComprehensionAdaptorTest {
                         .withSentiment(SentimentType.POSITIVE)
                         .withSentimentScore(SentimentScore().withMixed(0.5f).withNegative(0.6f).withNeutral(0.6f).withPositive(0.6f))
         )
-//        (messageSentimentResults as HashMap<String, DetectSentimentResult>)[MESSAGE_1_TEXT] = DetectSentimentResult()
-//                .withSentiment(SentimentType.NEUTRAL)
-//                .withSentimentScore(SentimentScore().withMixed(0.1f).withNegative(0.1f).withNeutral(0.1f).withPositive(0.1f))
-//        (messageSentimentResults as HashMap<String, DetectSentimentResult>)[MESSAGE_2_TEXT] = DetectSentimentResult()
-//                .withSentiment(SentimentType.NEUTRAL)
-//                .withSentimentScore(SentimentScore().withMixed(0.2f).withNegative(0.1f).withNeutral(0.2f).withPositive(0.2f))
-//        (messageSentimentResults as HashMap<String, DetectSentimentResult>)[MESSAGE_3_TEXT] = DetectSentimentResult()
-//                .withSentiment(SentimentType.NEUTRAL)
-//                .withSentimentScore(SentimentScore().withMixed(0.3f).withNegative(0.2f).withNeutral(0.3f).withPositive(0.3f))
-//        (messageSentimentResults as HashMap<String, DetectSentimentResult>)[MESSAGE_4_TEXT] = DetectSentimentResult()
-//                .withSentiment(SentimentType.MIXED)
-//                .withSentimentScore(SentimentScore().withMixed(0.4f).withNegative(0.3f).withNeutral(0.3f).withPositive(0.4f))
-//        (messageSentimentResults as HashMap<String, DetectSentimentResult>)[MESSAGE_5_TEXT] = DetectSentimentResult()
-//                .withSentiment(SentimentType.MIXED)
-//                .withSentimentScore(SentimentScore().withMixed(0.5f).withNegative(0.5f).withNeutral(0.4f).withPositive(0.5f))
-//        (messageSentimentResults as HashMap<String, DetectSentimentResult>)[MESSAGE_6_TEXT] = DetectSentimentResult()
-//                .withSentiment(SentimentType.POSITIVE)
-//                .withSentimentScore(SentimentScore().withMixed(0.5f).withNegative(0.6f).withNeutral(0.6f).withPositive(0.6f))
     }
 
     @Test
@@ -146,13 +113,13 @@ internal class AwsComprehensionAdaptorTest {
         assertThat(results.channelName).isEqualTo(channelName)
         assertThat(results.comprehensionDate).isEqualTo(LocalDate.now())
         assertThat(results.results).hasSize(3)
-        assertThat(results.results[EntityType.COMMERCIAL_ITEM.toString()] ?: mapOf()).hasSize(1)
-        assertThat(results.results[EntityType.COMMERCIAL_ITEM.toString()]?.get(COMMERCIAL_ITEM_ENTITY)).isEqualTo(3)
-        assertThat(results.results[EntityType.EVENT.toString()] ?: mapOf()).hasSize(2)
-        assertThat(results.results[EntityType.EVENT.toString()]?.get(EVENT_ENTITY_1)).isEqualTo(2)
-        assertThat(results.results[EntityType.EVENT.toString()]?.get(EVENT_ENTITY_2)).isEqualTo(1)
-        assertThat(results.results[EntityType.ORGANIZATION.toString()] ?: mapOf()).hasSize(1)
-        assertThat(results.results[EntityType.ORGANIZATION.toString()]?.get(ORGANIZATION_ENTITY)).isEqualTo(1)
+        assertThat(results.presentableResults[EntityType.COMMERCIAL_ITEM.toString()] ?: mapOf()).hasSize(1)
+        assertThat(results.presentableResults[EntityType.COMMERCIAL_ITEM.toString()]?.get(COMMERCIAL_ITEM_ENTITY)).isEqualTo(3)
+        assertThat(results.presentableResults[EntityType.EVENT.toString()] ?: mapOf()).hasSize(2)
+        assertThat(results.presentableResults[EntityType.EVENT.toString()]?.get(EVENT_ENTITY_1)).isEqualTo(2)
+        assertThat(results.presentableResults[EntityType.EVENT.toString()]?.get(EVENT_ENTITY_2)).isEqualTo(1)
+        assertThat(results.presentableResults[EntityType.ORGANIZATION.toString()] ?: mapOf()).hasSize(1)
+        assertThat(results.presentableResults[EntityType.ORGANIZATION.toString()]?.get(ORGANIZATION_ENTITY)).isEqualTo(1)
     }
 
     @Test
@@ -164,9 +131,9 @@ internal class AwsComprehensionAdaptorTest {
         assertThat(results.channelName).isEqualTo(channelName)
         assertThat(results.comprehensionDate).isEqualTo(LocalDate.now())
         assertThat(results.results).hasSize(3)
-        assertThat(results.results[KEY_PHRASE_TEXT_1]).isEqualTo(3)
-        assertThat(results.results[KEY_PHRASE_TEXT_2]).isEqualTo(2)
-        assertThat(results.results[KEY_PHRASE_TEXT_3]).isEqualTo(1)
+        assertThat(results.presentableResults[KEY_PHRASE_TEXT_1]).isEqualTo(3)
+        assertThat(results.presentableResults[KEY_PHRASE_TEXT_2]).isEqualTo(2)
+        assertThat(results.presentableResults[KEY_PHRASE_TEXT_3]).isEqualTo(1)
     }
 
     @Test

@@ -6,10 +6,8 @@ import uk.org.fyodor.generators.RDG
 import java.time.LocalDate
 
 class PresentableEntityResultsGenerator : Generator<PresentableEntityResults> {
-    var entityResultsGenerator = RDG.map(RDG.string(10),
-            RDG.map(RDG.string(10), RDG.longVal(100)))
 
     override fun next(): PresentableEntityResults {
-        return PresentableEntityResults(LocalDate.now(), entityResultsGenerator.next(), RDG.string().next())
+        return PresentableEntityResults(LocalDate.now(), RDG.list(ComprehendRDG.detectEntitiesResult()).next(), RDG.string().next())
     }
 }

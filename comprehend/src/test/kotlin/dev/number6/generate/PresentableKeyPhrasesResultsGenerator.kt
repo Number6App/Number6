@@ -6,10 +6,8 @@ import uk.org.fyodor.generators.RDG
 import java.time.LocalDate
 
 class PresentableKeyPhrasesResultsGenerator : Generator<PresentableKeyPhrasesResults> {
-    var keyPhrasesResultsGenerator = RDG.map(RDG.string(10),
-            RDG.longVal(100))
 
     override fun next(): PresentableKeyPhrasesResults {
-        return PresentableKeyPhrasesResults(LocalDate.now(), keyPhrasesResultsGenerator.next(), RDG.string().next())
+        return PresentableKeyPhrasesResults(LocalDate.now(), RDG.list(ComprehendRDG.detectKeyPhrasesResult()).next(), RDG.string().next())
     }
 }

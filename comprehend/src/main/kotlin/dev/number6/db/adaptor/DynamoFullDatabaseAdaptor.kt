@@ -22,15 +22,15 @@ class DynamoFullDatabaseAdaptor(private val mapper: DynamoDBMapper, private val 
     }
 
     override fun save(results: PresentableEntityResults) {
-        save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableEntityResults -> s.entityTotals = r.results })
+        save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableEntityResults -> s.entityTotals = r.presentableResults })
     }
 
     override fun save(results: PresentableKeyPhrasesResults) {
-        save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableKeyPhrasesResults -> s.keyPhrasesTotals = r.results })
+        save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableKeyPhrasesResults -> s.keyPhrasesTotals = r.presentableResults })
     }
 
-    private fun <T : ComprehensionResults<*>> save(results: T,
-                                                   summaryUpdater: BiConsumer<ChannelComprehensionSummary, T>) {
+    private fun <T : ComprehensionResults<*, *>> save(results: T,
+                                                      summaryUpdater: BiConsumer<ChannelComprehensionSummary, T>) {
         val dbSummaries = mapper.load(ChannelComprehensionSummary::class.java,
                 results.channelName,
                 results.comprehensionDate,

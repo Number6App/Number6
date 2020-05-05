@@ -5,13 +5,11 @@ import assertk.assertions.isEqualTo
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride
-import dev.number6.comprehend.results.PresentableEntityResults
-import dev.number6.comprehend.results.PresentableSentimentResults
-import dev.number6.comprehend.results.SentimentResultsToMessageSentimentScore
-import dev.number6.comprehend.results.SentimentResultsToMessageSentimentTotals
+import dev.number6.comprehend.results.*
 import dev.number6.db.adaptor.DatabaseServiceConfigurationAdaptor
 import dev.number6.db.adaptor.DynamoFullDatabaseAdaptor
 import dev.number6.db.model.ChannelComprehensionSummary
+import dev.number6.generate.ComprehendRDG
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -67,11 +65,28 @@ internal class DynamoFullDatabaseAdaptorTest {
     }
 
     @Test
+    fun saveKeyPhrasesResults() {
+        val channelName = RDG.string(20).next()
+        val summary = ChannelComprehensionSummary(channelName, LocalDate.now())
+        every { mapper.load(any<Class<Any>>(), any(), any(), any()) } returns summary
+        val keyPhrasesResults = RDG.list(ComprehendRDG.detectKeyPhrasesResult()).next()
+        val results = PresentableKeyPhrasesResults(LocalDate.now(), keyPhrasesResults, channelName)
+        val configCaptor = slot<DynamoDBMapperConfig>()
+        val summaryCaptor = slot<ChannelComprehensionSummary>()
+        testee.save(results)
+        verify { mapper.save(capture(summaryCaptor), capture(configCaptor)) }
+        assertThat(configCaptor.captured.tableNameOverride.tableName).isEqualTo(OVERRIDE_TABLE_NAME)
+        assertThat(summaryCaptor.captured.channelName).isEqualTo(channelName)
+        assertThat(summaryCaptor.captured.comprehensionDate).isEqualTo(LocalDate.now())
+        assertThat(summaryCaptor.captured.keyPhrasesTotals).isEqualTo(results.presentableResults)
+    }
+
+    @Test
     fun saveEntityResults() {
         val channelName = RDG.string(20).next()
         val summary = ChannelComprehensionSummary(channelName, LocalDate.now())
         every { mapper.load(any<Class<Any>>(), any(), any(), any()) } returns summary
-        val detectEntitiesResults = RDG.map(RDG.string(), RDG.map(RDG.string(20), RDG.longVal(Range.closed(1L, 10L)))).next()
+        val detectEntitiesResults = RDG.list(ComprehendRDG.detectEntitiesResult()).next()
         val results = PresentableEntityResults(LocalDate.now(), detectEntitiesResults, channelName)
         val configCaptor = slot<DynamoDBMapperConfig>()
         val summaryCaptor = slot<ChannelComprehensionSummary>()
@@ -80,7 +95,7 @@ internal class DynamoFullDatabaseAdaptorTest {
         assertThat(configCaptor.captured.tableNameOverride.tableName).isEqualTo(OVERRIDE_TABLE_NAME)
         assertThat(summaryCaptor.captured.channelName).isEqualTo(channelName)
         assertThat(summaryCaptor.captured.comprehensionDate).isEqualTo(LocalDate.now())
-        assertThat(summaryCaptor.captured.entityTotals).isEqualTo(detectEntitiesResults)
+        assertThat(summaryCaptor.captured.entityTotals).isEqualTo(results.presentableResults)
     }
 
     @Test

@@ -33,7 +33,7 @@ class DynamoFullDatabaseAdaptorIntegrationTest {
     fun saveEntityResults() {
         val results = ComprehendRDG.presentableEntityResults().next()
         val summary = saveResults(Consumer { m -> m.save(results) })
-        assertThat(summary.entityTotals).isEqualTo(results.results)
+        assertThat(summary.entityTotals).isEqualTo(results.presentableResults)
     }
 
     @Test
@@ -48,7 +48,7 @@ class DynamoFullDatabaseAdaptorIntegrationTest {
     fun saveKeyPhrasesResults() {
         val results = ComprehendRDG.presentableKeyPhrasesResults().next()
         val summary = saveResults(Consumer { m -> m.save(results) })
-        assertThat(summary.keyPhrasesTotals).isEqualTo(results.results)
+        assertThat(summary.keyPhrasesTotals).isEqualTo(results.presentableResults)
     }
 
     private fun saveResults(resultsConsumer: Consumer<FullDatabasePort>): ChannelComprehensionSummary {

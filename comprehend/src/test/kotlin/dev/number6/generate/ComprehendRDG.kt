@@ -8,6 +8,9 @@ object ComprehendRDG : RDG() {
     private val presentableSentimentResultsGenerator = PresentableSentimentResultsGenerator()
     private val channelMessagesGenerator = ChannelMessagesGenerator()
     private val channelComprehensionSummaryGenerator = ChannelComprehensionSummaryGenerator()
+    private val entityGenerator = EntityGenerator()
+    private val keyPhraseGenerator = KeyPhraseGenerator()
+
     fun channelComprehensionSummary(): ChannelComprehensionSummaryGenerator {
         return channelComprehensionSummaryGenerator
     }
@@ -26,6 +29,22 @@ object ComprehendRDG : RDG() {
 
     fun detectSentimentResult(): DetectSentimentResultGenerator {
         return DetectSentimentResultGenerator()
+    }
+
+    fun detectEntitiesResult(): DetectEntitiesResultGenerator {
+        return DetectEntitiesResultGenerator()
+    }
+
+    fun detectKeyPhrasesResult(): DetectKeyPhrasesResultGenerator {
+        return DetectKeyPhrasesResultGenerator()
+    }
+
+    fun keyPhrase(): KeyPhraseGenerator {
+        return keyPhraseGenerator
+    }
+
+    fun entity() : EntityGenerator {
+        return entityGenerator
     }
 
     fun channelMessages(): ChannelMessagesGenerator {
