@@ -13,6 +13,6 @@ class ChannelMessagesHandlerModule {
     @Provides
     fun providesMessageComprehension(channelMessagesToComprehensionResultsFunction: ChannelMessagesToComprehensionResultsFunction<PresentableKeyPhrasesResults>,
                                      comprehensionResultsConsumer: ComprehensionResultsConsumer<PresentableKeyPhrasesResults>): ChannelMessagesHandler {
-        return ChannelMessagesComprehensionHandler<PresentableKeyPhrasesResults>(channelMessagesToComprehensionResultsFunction, comprehensionResultsConsumer)
+        return ChannelMessagesComprehensionHandler(channelMessagesToComprehensionResultsFunction, comprehensionResultsConsumer)
     }
 }

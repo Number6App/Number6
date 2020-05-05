@@ -11,7 +11,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 internal class ChannelMessagesEntityComprehensionComponentIntegrationTest {
-    var testee = DaggerTestChannelMessagesEntityComprehensionComponent.create()
+    private var testee = DaggerTestChannelMessagesEntityComprehensionComponent.create()
 
     @Test
     fun providesChannelHandler() {
@@ -19,7 +19,7 @@ internal class ChannelMessagesEntityComprehensionComponentIntegrationTest {
         val handler = testee.getChannelMessagesHandler()
         val f = testee.getResultsFunction() as FakeComprehensionResultsModule.ConfigurableResultsFunction
         f.setPresentableEntityResults(results)
-        handler.handle(mockk<ChannelMessages>())
+        handler.handle(mockk())
         val consumer = testee.getConsumer() as FakeComprehensionResultsModule.RecordingComprehensionResultsConsumer
         assertThat(consumer.getResultsConsumed()).hasSize(1)
         assertThat(consumer.getResultsConsumed()[0]).isEqualTo(results)

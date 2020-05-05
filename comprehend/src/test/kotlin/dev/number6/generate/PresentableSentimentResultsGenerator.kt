@@ -7,7 +7,7 @@ import uk.org.fyodor.range.Range
 import java.time.LocalDate
 
 class PresentableSentimentResultsGenerator : Generator<PresentableSentimentResults> {
-    var detectSentimentResultsGenerator = RDG.list(ComprehendRDG.detectSentimentResult(), Range.closed(10, 20))
+    private var detectSentimentResultsGenerator = RDG.list(ComprehendRDG.detectSentimentResult(), Range.closed(10, 20))
     override fun next(): PresentableSentimentResults {
         return PresentableSentimentResults(LocalDate.now(),
                 detectSentimentResultsGenerator.next(),

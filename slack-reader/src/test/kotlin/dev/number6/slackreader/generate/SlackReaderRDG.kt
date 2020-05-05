@@ -26,20 +26,12 @@ object SlackReaderRDG : RDG() {
         return channelsListResponseGenerator
     }
 
-    fun jsonChannelsListResponse(): Generator<String> {
-        return Generator { gson.toJson(channelsListResponse().next()) }
-    }
-
     fun channel(): Generator<Channel> {
         return channelGenerator
     }
 
     fun message(): Generator<Message> {
         return MessageGenerator()
-    }
-
-    fun jsonChannelHistoryResponse(): Generator<String> {
-        return Generator { gson.toJson(channelHistoryResponse().next()) }
     }
 
     fun channelHistoryResponse(): Generator<ChannelHistoryResponse> {

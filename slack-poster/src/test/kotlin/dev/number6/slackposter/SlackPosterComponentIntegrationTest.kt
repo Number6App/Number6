@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 
 class SlackPosterComponentIntegrationTest {
     private var testee = DaggerTestSlackPosterComponent.create()
-    var gson = Gson()
 
     @Test
     fun postCorrectChatToSlack() {

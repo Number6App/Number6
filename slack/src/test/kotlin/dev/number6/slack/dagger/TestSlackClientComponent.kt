@@ -2,8 +2,6 @@ package dev.number6.slack.dagger
 
 import dagger.Component
 import dev.number6.slack.dagger.FakeAWSSecretsManagerModule
-import dev.number6.slack.dagger.HttpModule
-import dev.number6.slack.dagger.SlackClientModule
 import dev.number6.slack.port.SlackPort
 import javax.inject.Singleton
 

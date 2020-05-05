@@ -38,9 +38,4 @@ class SlackClientIntegrationTest {
     fun postMessage() {
         testee.slackPort().postMessageToChannel("Message Content", logger)
     }
-
-    private class FakeLogger : LambdaLogger {
-        override fun log(message: String) {}
-        override fun log(message: ByteArray) {}
-    }
 }

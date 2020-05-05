@@ -26,9 +26,9 @@ internal class SentimentResultsToMessagePresentableSentimentTotalsTest {
                 DetectSentimentResult().withSentiment(SentimentType.POSITIVE))
         val totals = testee.apply(results)
         assertThat(totals).isNotNull()
-        assertThat(totals.get(SentimentType.MIXED.toString())).isEqualTo(1)
-        assertThat(totals.get(SentimentType.NEGATIVE.toString())).isEqualTo(2)
-        assertThat(totals.get(SentimentType.NEUTRAL.toString())).isEqualTo(3)
-        assertThat(totals.get(SentimentType.POSITIVE.toString())).isEqualTo(4)
+        assertThat(totals[SentimentType.MIXED.toString()]).isEqualTo(1)
+        assertThat(totals[SentimentType.NEGATIVE.toString()]).isEqualTo(2)
+        assertThat(totals[SentimentType.NEUTRAL.toString()]).isEqualTo(3)
+        assertThat(totals[SentimentType.POSITIVE.toString()]).isEqualTo(4)
     }
 }

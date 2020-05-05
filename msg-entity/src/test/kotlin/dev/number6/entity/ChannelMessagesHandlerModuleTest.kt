@@ -14,12 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class ChannelMessagesHandlerModuleTest {
-    var channelMessages: ChannelMessages = mockk()
-    var results: PresentableEntityResults = mockk()
-    var toResults: ChannelMessagesToComprehensionResultsFunction<PresentableEntityResults> = mockk()
-    var resultConsumer: ComprehensionResultsConsumer<PresentableEntityResults> = mockk(relaxUnitFun = true)
+    private var channelMessages: ChannelMessages = mockk()
+    private var results: PresentableEntityResults = mockk()
+    private var toResults: ChannelMessagesToComprehensionResultsFunction<PresentableEntityResults> = mockk()
+    private var resultConsumer: ComprehensionResultsConsumer<PresentableEntityResults> = mockk(relaxUnitFun = true)
 
-    var module = ChannelMessagesHandlerModule()
+    private var module = ChannelMessagesHandlerModule()
 
     @Test
     fun providesChannelHandler() {

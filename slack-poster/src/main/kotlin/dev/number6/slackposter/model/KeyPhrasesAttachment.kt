@@ -1,7 +1,6 @@
 package dev.number6.slackposter.model
 
 import dev.number6.slackposter.ChannelSummaryImage
-import java.text.MessageFormat
 import java.util.Map.Entry.comparingByValue
 import java.util.stream.Collectors
 

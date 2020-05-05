@@ -5,5 +5,4 @@ import dagger.Module
 @Module(includes = [SlackClientModule::class,
     HttpClientModule::class,
     AWSSecretsModule::class])
-class SlackClientLiveBindingsModule {
-}
+class SlackClientLiveBindingsModule

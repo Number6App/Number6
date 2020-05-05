@@ -17,15 +17,7 @@ object SlackPosterRDG : RDG() {
         return DoubleAttributeValueGenerator(max)
     }
 
-    fun doubleAttributeValues(range: Range<Double>): Generator<AttributeValue> {
-        return DoubleAttributeValueGenerator(range)
-    }
-
     fun integerAttributeValues(max: Int): Generator<AttributeValue> {
         return IntegerAttributeValueGenerator(max)
-    }
-
-    fun integerAttributeValues(range: Range<Int>): Generator<AttributeValue> {
-        return IntegerAttributeValueGenerator(range)
     }
 }

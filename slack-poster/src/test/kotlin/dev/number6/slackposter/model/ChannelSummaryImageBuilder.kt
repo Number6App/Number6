@@ -10,14 +10,14 @@ import java.time.LocalDate
 import java.util.*
 
 class ChannelSummaryImageBuilder private constructor() {
-    var version = RDG.integer(8).next()
-    var channelName = RDG.string(10, CharacterSetFilter.LettersOnly).next()
-    var comprehensionDate = LocalDate.now().toString()
-    var sentimentTotals = RDG.map(RDG.string(10), SlackPosterRDG.integerAttributeValues(10), Range.closed(5, 20)).next()
-    var sentimentScoreTotals = RDG.map(RDG.string(10), SlackPosterRDG.doubleAttributeValues(10.0), Range.closed(5, 20)).next()
-    var entityTotals = RDG.map(RDG.string(10, CharacterSetFilter.LettersAndDigits),
+    private var version = RDG.integer(8).next()
+    private var channelName = RDG.string(10, CharacterSetFilter.LettersOnly).next()
+    private var comprehensionDate = LocalDate.now().toString()
+    private var sentimentTotals = RDG.map(RDG.string(10), SlackPosterRDG.integerAttributeValues(10), Range.closed(5, 20)).next()
+    private var sentimentScoreTotals = RDG.map(RDG.string(10), SlackPosterRDG.doubleAttributeValues(10.0), Range.closed(5, 20)).next()
+    private var entityTotals = RDG.map(RDG.string(10, CharacterSetFilter.LettersAndDigits),
             SlackPosterRDG.mapAttributeValues(RDG.string(20, CharacterSetFilter.LettersAndDigits), SlackPosterRDG.integerAttributeValues(10), RDG.integer(20).next()), Range.closed(5, 20)).next()
-    var keyPhrasesTotals = RDG.map(RDG.string(10), SlackPosterRDG.integerAttributeValues(10), Range.closed(5, 20)).next()
+    private var keyPhrasesTotals = RDG.map(RDG.string(10), SlackPosterRDG.integerAttributeValues(10), Range.closed(5, 20)).next()
     fun version(v: Int): ChannelSummaryImageBuilder {
         version = v
         return this

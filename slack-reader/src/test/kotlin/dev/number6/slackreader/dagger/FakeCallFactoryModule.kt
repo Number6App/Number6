@@ -5,12 +5,12 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dev.number6.slack.adaptor.SlackClientAdaptor
-import dev.number6.slack.port.SecretsPort
-import dev.number6.slackreader.generate.SlackReaderRDG
 import dev.number6.slack.model.Channel
 import dev.number6.slack.model.ChannelHistoryResponse
 import dev.number6.slack.model.ChannelsListResponse
 import dev.number6.slack.model.JoinChannelResponse
+import dev.number6.slack.port.SecretsPort
+import dev.number6.slackreader.generate.SlackReaderRDG
 import okhttp3.*
 import org.apache.http.entity.ContentType
 import javax.inject.Singleton
@@ -123,7 +123,7 @@ class FakeCallFactoryModule {
 
         init {
             channelMessages = channelListResponse.channels
-                    .associateWith { _ -> SlackReaderRDG.channelHistoryResponse().next() }
+                    .associateWith { SlackReaderRDG.channelHistoryResponse().next() }
         }
     }
 

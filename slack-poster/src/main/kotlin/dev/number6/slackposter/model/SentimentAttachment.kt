@@ -6,7 +6,6 @@ import java.math.MathContext
 import java.text.MessageFormat
 import java.util.*
 import java.util.Map.Entry.comparingByValue
-import java.util.function.Function
 import java.util.stream.Collectors
 
 class SentimentAttachment(fallback: String, color: String, title: String, pretext: String, fields: Array<Field>) :

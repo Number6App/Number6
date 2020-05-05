@@ -25,7 +25,7 @@ import java.time.ZoneOffset
 @ExtendWith(MockKExtension::class)
 internal class SlackClientAdaptorTest {
     var logger: LambdaLogger = mockk(relaxUnitFun = true)
-    var http: HttpPort = mockk()
+    private var http: HttpPort = mockk()
 
     val testee = SlackClientAdaptor(http)
 

@@ -3,7 +3,6 @@ package dev.number6.keyphrases.adaptor
 import dev.number6.comprehend.results.PresentableEntityResults
 import dev.number6.comprehend.results.PresentableKeyPhrasesResults
 import dev.number6.comprehend.results.PresentableSentimentResults
-import dev.number6.db.port.BasicDatabasePort
 import dev.number6.db.port.FullDatabasePort
 import java.time.LocalDate
 

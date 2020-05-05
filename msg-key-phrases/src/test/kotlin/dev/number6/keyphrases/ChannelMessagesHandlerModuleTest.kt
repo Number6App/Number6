@@ -19,7 +19,7 @@ internal class ChannelMessagesHandlerModuleTest {
     private val toResults: ChannelMessagesToComprehensionResultsFunction<PresentableKeyPhrasesResults> = mockk()
     private val resultConsumer: ComprehensionResultsConsumer<PresentableKeyPhrasesResults> = mockk(relaxUnitFun = true)
 
-    var module: ChannelMessagesHandlerModule = ChannelMessagesHandlerModule()
+    private var module: ChannelMessagesHandlerModule = ChannelMessagesHandlerModule()
 
     @Test
     fun providesChannelHandler() {

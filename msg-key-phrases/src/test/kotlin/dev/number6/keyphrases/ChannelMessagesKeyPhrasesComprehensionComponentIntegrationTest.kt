@@ -10,7 +10,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 internal class ChannelMessagesKeyPhrasesComprehensionComponentIntegrationTest {
-    var testee = DaggerTestChannelMessagesKeyPhrasesComprehensionComponent.create()
+    private var testee = DaggerTestChannelMessagesKeyPhrasesComprehensionComponent.create()
 
     @Test
     fun providesChannelHandler() {

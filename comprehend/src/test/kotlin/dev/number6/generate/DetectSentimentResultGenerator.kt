@@ -6,8 +6,8 @@ import uk.org.fyodor.generators.Generator
 import uk.org.fyodor.generators.RDG
 
 class DetectSentimentResultGenerator : Generator<DetectSentimentResult> {
-    var sentimentScoreGenerator = SentimentScoreGenerator()
-    var sentimentTypeGenerator = RDG.value(SentimentType::class.java)
+    private var sentimentScoreGenerator = SentimentScoreGenerator()
+    private var sentimentTypeGenerator = RDG.value(SentimentType::class.java)
     override fun next(): DetectSentimentResult {
         return DetectSentimentResult()
                 .withSentiment(sentimentTypeGenerator.next())
