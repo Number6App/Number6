@@ -11,20 +11,36 @@ import com.amazonaws.services.dynamodbv2.waiters.AmazonDynamoDBWaiters
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dev.number6.db.TestDynamoBasicDatabaseAdaptorComponent.FakeDatabaseConfig
 import dev.number6.db.TestDynamoBasicDatabaseAdaptorComponent.FakeDynamoDBMapperModule
 import dev.number6.db.dagger.BasicDatabasePortModule
 import dev.number6.db.model.ChannelComprehensionSummary
 import dev.number6.db.port.BasicDatabasePort
+import dev.number6.db.port.DatabaseConfigurationPort
 import dev.number6.generate.CommonRDG
 import org.junit.jupiter.api.Assertions
 import java.util.*
 import javax.inject.Singleton
 
-@Component(modules = [BasicDatabasePortModule::class, FakeDynamoDBMapperModule::class])
+@Component(modules = [BasicDatabasePortModule::class,
+    FakeDynamoDBMapperModule::class,
+    FakeDatabaseConfig::class])
 @Singleton
 interface TestDynamoBasicDatabaseAdaptorComponent {
     val database: BasicDatabasePort
     val fakeDynamoDBMapper: DynamoDBMapper
+
+    @Module
+    class FakeDatabaseConfig {
+        @Provides
+        @Singleton
+        fun providesDatabaseConfig(): DatabaseConfigurationPort {
+            return object : DatabaseConfigurationPort {
+                override val dynamoDBMapperConfig: DynamoDBMapperConfig
+                    get() = DynamoDBMapperConfig.DEFAULT
+            }
+        }
+    }
 
     @Module
     class FakeDynamoDBMapperModule {

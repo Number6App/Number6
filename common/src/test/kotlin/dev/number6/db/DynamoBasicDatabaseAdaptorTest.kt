@@ -1,7 +1,9 @@
 package dev.number6.db
 
 import assertk.assertThat
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.isIn
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride
@@ -50,14 +52,18 @@ internal class DynamoBasicDatabaseAdaptorTest {
 
     @Test
     fun savesComprehensionSummaryForEachChannel() {
-        val channelNames = RDG.list(RDG.string(), Range.closed(3, 20)).next()
+        val channelNames = RDG.list(RDG.string(), Range.closed(3, 20)).next().toMutableList()
         val comprehensionDate = LocalDate.now()
         val configSlot = mutableListOf<DynamoDBMapperConfig>()
         val summarySlot = mutableListOf<ChannelComprehensionSummary>()
         testee.createNewSummaryForChannels(channelNames, comprehensionDate)
         verify(exactly = channelNames.size) { mapper.save(capture(summarySlot), capture(configSlot)) }
-//        Assertions.assertThat(summaryCaptor.allValues.stream().map(ChannelComprehensionSummary::channelName).collect(Collectors.toList())).containsExactlyInAnyOrderElementsOf(channelNames)
-        summarySlot.forEach { c -> assertThat(c.comprehensionDate).isEqualTo(comprehensionDate) }
+        summarySlot.forEach { c ->
+            assertThat(c.comprehensionDate).isEqualTo(comprehensionDate)
+            assertThat(c.channelName).isIn(*channelNames.toTypedArray())
+            channelNames.remove(c.channelName)
+        }
+        assertThat(channelNames).isEmpty()
         configSlot.forEach { c -> assertThat(c.tableNameOverride.tableName).isEqualTo(OVERRIDE_TABLE_NAME) }
     }
 

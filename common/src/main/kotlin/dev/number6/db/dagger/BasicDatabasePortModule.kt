@@ -7,7 +7,7 @@ import dev.number6.db.adaptor.DynamoBasicDatabaseAdaptor
 import dev.number6.db.port.DatabaseConfigurationPort
 import dev.number6.db.port.BasicDatabasePort
 
-@Module(includes = [DatabaseConfigurationPortModule::class])
+@Module
 class BasicDatabasePortModule {
     @Provides
     fun dbService(mapper: DynamoDBMapper, dbConfig: DatabaseConfigurationPort): BasicDatabasePort {
