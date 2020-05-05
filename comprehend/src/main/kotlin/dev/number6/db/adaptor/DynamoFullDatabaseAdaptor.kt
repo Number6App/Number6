@@ -9,33 +9,34 @@ import dev.number6.comprehend.results.PresentableSentimentResults
 import dev.number6.db.model.ChannelComprehensionSummary
 import dev.number6.db.port.DatabaseConfigurationPort
 import dev.number6.db.port.FullDatabasePort
-import java.util.function.BiConsumer
+
+typealias SummaryUpdate<T> = (s: ChannelComprehensionSummary, r: T) -> Unit
 
 class DynamoFullDatabaseAdaptor(private val mapper: DynamoDBMapper, private val dbConfig: DatabaseConfigurationPort) :
         DynamoBasicDatabaseAdaptor(mapper, dbConfig), FullDatabasePort {
 
     override fun save(results: PresentableSentimentResults) {
-        save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableSentimentResults ->
+        save(results, { s: ChannelComprehensionSummary, r: PresentableSentimentResults ->
             s.sentimentTotals = r.sentimentTotals
             s.sentimentScoreTotals = r.sentimentScoreTotals
         })
     }
 
     override fun save(results: PresentableEntityResults) {
-        save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableEntityResults -> s.entityTotals = r.presentableResults })
+        save(results, { s: ChannelComprehensionSummary, r: PresentableEntityResults -> s.entityTotals = r.presentableResults })
     }
 
     override fun save(results: PresentableKeyPhrasesResults) {
-        save(results, BiConsumer { s: ChannelComprehensionSummary, r: PresentableKeyPhrasesResults -> s.keyPhrasesTotals = r.presentableResults })
+        save(results, { s: ChannelComprehensionSummary, r: PresentableKeyPhrasesResults -> s.keyPhrasesTotals = r.presentableResults })
     }
 
     private fun <T : ComprehensionResults<*, *>> save(results: T,
-                                                      summaryUpdater: BiConsumer<ChannelComprehensionSummary, T>) {
+                                                      summaryUpdater: SummaryUpdate<T>) {
         val dbSummaries = mapper.load(ChannelComprehensionSummary::class.java,
                 results.channelName,
                 results.comprehensionDate,
                 dbConfig.dynamoDBMapperConfig)
-        summaryUpdater.accept(dbSummaries, results)
+        summaryUpdater.invoke(dbSummaries, results)
         try {
             mapper.save(dbSummaries, dbConfig.dynamoDBMapperConfig)
         } catch (e: ConditionalCheckFailedException) {
