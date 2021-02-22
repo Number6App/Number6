@@ -49,7 +49,7 @@ class FakeHttpClientModule {
         },
         ChannelMessages {
             override fun canHandle(request: Request): Boolean {
-                return request.url().toString().startsWith("https://slack.com/api/channels.history")
+                return request.url().toString().startsWith("https://slack.com/api/conversations.history")
             }
 
             override fun getData(fakeCallData: FakeCallData, request: Request): String {
