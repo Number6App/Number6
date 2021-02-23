@@ -1,0 +1,6 @@
+package dev.number6.keyphrases
+
+import dev.number6.keyphrases.dagger.DaggerChannelMessagesKeyPhrasesComprehensionComponent
+import dev.number6.message.ChannelMessagesNotificationRequestHandler
+
+class ChannelMessagesKeyPhrasesRequestHandler : ChannelMessagesNotificationRequestHandler(DaggerChannelMessagesKeyPhrasesComprehensionComponent.create().getChannelMessagesHandler())

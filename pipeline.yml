@@ -43,6 +43,12 @@ Resources:
         - Key: Name
           Value: !Ref ProjectName
 
+  CodeBuildLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/codebuild/${ProjectName}"
+      RetentionInDays: 30
+
   AppPipelineWebhook:
     Type: AWS::CodePipeline::Webhook
     Properties:

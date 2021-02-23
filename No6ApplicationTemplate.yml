@@ -43,6 +43,11 @@ Resources:
       AutoPublishAlias: MsgSentiment
       DeploymentPreference:
         Type: AllAtOnce
+  MessageSentimentFunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${MessageSentimentFunction}"
+      RetentionInDays: 30
 
   MessageEntityFunction:
     Type: AWS::Serverless::Function
@@ -64,6 +69,11 @@ Resources:
       AutoPublishAlias: MsgEntity
       DeploymentPreference:
         Type: AllAtOnce
+  MessageEntityFunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${MessageEntityFunction}"
+      RetentionInDays: 30
 
   MessageKeyPhrasesFunction:
     Type: AWS::Serverless::Function
@@ -85,6 +95,11 @@ Resources:
       AutoPublishAlias: MsgKeyPhrases
       DeploymentPreference:
         Type: AllAtOnce
+  MessageKeyPhrasesFunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${MessageKeyPhrasesFunction}"
+      RetentionInDays: 30
 
   SlackReaderFunction:
     Type: AWS::Serverless::Function
@@ -109,8 +124,13 @@ Resources:
       AutoPublishAlias: SlackReader
       DeploymentPreference:
         Type: AllAtOnce
+  SlackReaderFunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${SlackReaderFunction}"
+      RetentionInDays: 30
 
-  ProcessComprehensionsStream:
+  SlackPosterFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: dev.number6.slackposter.SlackPosterRequestHandler::handleRequest
@@ -131,6 +151,11 @@ Resources:
             Stream: !GetAtt SlackComprehensions.StreamArn
             BatchSize: 100
             StartingPosition: TRIM_HORIZON
+  SlackPosterFunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${SlackPosterFunction}"
+      RetentionInDays: 30
 
   SlackComprehensions:
     Type: AWS::DynamoDB::Table
